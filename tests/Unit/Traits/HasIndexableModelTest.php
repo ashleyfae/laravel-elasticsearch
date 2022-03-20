@@ -17,17 +17,25 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Ashleyfae\LaravelElasticsearch\Tests\Models\IndexableModel
+ * @covers \Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel
  */
-class IndexableModelTest extends TestCase
+class HasIndexableModelTest extends TestCase
 {
     /**
+     * @return \PHPUnit\Framework\MockObject\MockObject&HasIndexableModel
+     */
+    private function getTraitMock()
+    {
+        return $this->getMockForTrait(HasIndexableModel::class);
+    }
+
+    /**
+     * @covers \Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel::validateModel()
      * @dataProvider providerCanValidateModel
      */
     public function testCanValidateModel($model, bool $validationShouldPass): void
     {
-        /** @var HasIndexableModel $mock */
-        $mock = $this->getMockForTrait(HasIndexableModel::class);
+        $mock = $this->getTraitMock();
 
         if ($validationShouldPass) {
             $this->expectNotToPerformAssertions();
@@ -44,5 +52,18 @@ class IndexableModelTest extends TestCase
         yield 'Has Indexable trait' => [new IndexableModel(), true];
 
         yield 'Does not have Indexable trait' => [Mockery::mock(Model::class), false];
+    }
+
+    /**
+     * @covers \Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel::forModel()
+     */
+    public function testCanForModel(): void
+    {
+        $mock = $this->getTraitMock();
+        $this->assertFalse(isset($mock->model));
+
+        $mock->forModel(new IndexableModel());
+
+        $this->assertInstanceOf(IndexableModel::class, $mock->model);
     }
 }

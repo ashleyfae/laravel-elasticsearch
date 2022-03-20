@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 trait HasIndexableModel
 {
     /** @var Model&Indexable */
-    protected Model $model;
+    public Model $model;
 
     /**
      * Validates the model to ensure it has the Indexable trait.
