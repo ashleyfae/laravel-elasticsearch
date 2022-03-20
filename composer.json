@@ -1,0 +1,25 @@
+{
+    "name": "ashleyfae/laravel-elasticsearch",
+    "description": "Elasticsearch query builder for Laravel.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ashleyfae\\LaravelElasticsearch\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "orchestra/testbench": "7.0.x-dev"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ashleyfae\\LaravelElasticsearch\\ServiceProvider"
+            ]
+        }
+    }
+}
