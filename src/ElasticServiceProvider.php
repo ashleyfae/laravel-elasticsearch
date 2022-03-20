@@ -9,6 +9,7 @@
 
 namespace Ashleyfae\LaravelElasticsearch;
 
+use Ashleyfae\LaravelElasticsearch\Console\Commands\CreateIndex;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;
@@ -51,7 +52,7 @@ class ElasticServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                // @todo
+                CreateIndex::class,
             ]);
         }
 
