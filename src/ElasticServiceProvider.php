@@ -26,6 +26,10 @@ class ElasticServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
+        $this->registerCommands();
+
         $this->mergeConfigFrom(
             __DIR__.'/../config/elasticsearch.php',
             'elasticsearch'
@@ -36,5 +40,20 @@ class ElasticServiceProvider extends ServiceProvider
                 __DIR__.'/../config/elasticsearch.php' => config_path('elasticsearch.php')
             ], 'config');
         }
+    }
+
+    /**
+     * Registers console commands.
+     *
+     * @return void
+     */
+    protected function registerCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                // @todo
+            ]);
+        }
+
     }
 }

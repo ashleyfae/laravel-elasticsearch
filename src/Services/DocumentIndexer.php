@@ -10,32 +10,16 @@
 namespace Ashleyfae\LaravelElasticsearch\Services;
 
 use Ashleyfae\LaravelElasticsearch\Exceptions\ModelDoesNotExistException;
-use Ashleyfae\LaravelElasticsearch\Traits\Indexable;
+use Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel;
 use Elasticsearch\Client;
-use Illuminate\Database\Eloquent\Model;
 
-class Indexer
+class DocumentIndexer
 {
-    /** @var Model&Indexable */
-    protected Model $model;
+    use HasIndexableModel;
 
     public function __construct(protected Client $elasticClient)
     {
 
-    }
-
-    /**
-     * Sets the model.
-     *
-     * @param  Model&Indexable  $model
-     *
-     * @return $this
-     */
-    public function forModel(Model $model): static
-    {
-        $this->model = $model;
-
-        return $this;
     }
 
     /**

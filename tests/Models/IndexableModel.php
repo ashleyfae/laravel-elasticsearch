@@ -9,9 +9,10 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Tests\Models;
 
+use Ashleyfae\LaravelElasticsearch\Traits\Indexable;
 use Illuminate\Database\Eloquent\Model;
 
 class IndexableModel extends Model
 {
-
+    use Indexable;
 }
