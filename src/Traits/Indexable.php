@@ -9,6 +9,8 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Traits;
 
+use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
+use Ashleyfae\LaravelElasticsearch\Exceptions\ModelDoesNotExistException;
 use Ashleyfae\LaravelElasticsearch\Services\DocumentIndexer;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Illuminate\Database\Eloquent\Model;
@@ -20,7 +22,13 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 trait Indexable
 {
 
-    public function getIndexer(): DocumentIndexer
+    /**
+     * Retrieves the document indexer for this model.
+     *
+     * @return DocumentIndexer
+     * @throws InvalidModelException
+     */
+    public function getDocumentIndexer(): DocumentIndexer
     {
         /** @var DocumentIndexer $indexer */
         $indexer = app(DocumentIndexer::class);
@@ -53,10 +61,11 @@ trait Indexable
      * Indexes this model.
      *
      * @return void
+     * @throws ModelDoesNotExistException
      */
     public function indexModel(): void
     {
-        $this->getIndexer()->index();
+        $this->getDocumentIndexer()->index();
     }
 
     /**

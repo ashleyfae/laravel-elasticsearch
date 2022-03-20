@@ -27,7 +27,7 @@ trait HasIndexableModel
      */
     public function validateModel(Model $model): void
     {
-        if (! in_array(Indexable::class, class_uses($model), true)) {
+        if (! is_object($model) || ! in_array(Indexable::class, class_uses($model), true)) {
             throw new InvalidModelException();
         }
     }
