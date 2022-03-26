@@ -9,10 +9,14 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Traits;
 
+use Ashleyfae\LaravelElasticsearch\Contracts\ResultFormatterInterface;
+use Ashleyfae\LaravelElasticsearch\Contracts\SearchInterface;
 use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
 use Ashleyfae\LaravelElasticsearch\Exceptions\ModelDoesNotExistException;
 use Ashleyfae\LaravelElasticsearch\Services\DocumentIndexer;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
+use Ashleyfae\LaravelElasticsearch\Services\Search\QueryBuilder;
+use Ashleyfae\LaravelElasticsearch\Services\Search\ResultFormatter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -21,7 +25,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  */
 trait Indexable
 {
-
     /**
      * Retrieves the document indexer for this model.
      *
@@ -34,6 +37,29 @@ trait Indexable
         $indexer = app(DocumentIndexer::class);
 
         return $indexer->forModel(new static);
+    }
+
+    /**
+     * Builds a SearchQuery object for this model.
+     *
+     * @return SearchInterface
+     * @throws InvalidModelException
+     */
+    public function getSearchQueryBuilder(): SearchInterface
+    {
+        return app(QueryBuilder::class)
+            ->forModel($this)
+            ->setFormatter($this->getSearchFormatter());
+    }
+
+    /**
+     * Search formatter to use for this model.
+     *
+     * @return ResultFormatterInterface
+     */
+    protected function getSearchFormatter(): ResultFormatterInterface
+    {
+        return app(ResultFormatter::class);
     }
 
     /**
@@ -76,6 +102,18 @@ trait Indexable
     public function toElasticIndex(): array
     {
         return $this->toArray();
+    }
+
+    /**
+     * Routing value.
+     *
+     * @link https://www.elastic.co/guide/en/elasticsearch/guide/current/routing-value.html
+     *
+     * @return mixed
+     */
+    public function getElasticRoutingValue(): mixed
+    {
+        return null;
     }
 
 }

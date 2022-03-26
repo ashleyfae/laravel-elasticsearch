@@ -11,7 +11,6 @@ namespace Ashleyfae\LaravelElasticsearch\Console\Commands;
 
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
 use Ashleyfae\LaravelElasticsearch\Tests\Models\IndexableModel;
-use Ashleyfae\LaravelElasticsearch\Traits\ValidatesIndexableModels;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -52,6 +51,8 @@ class CreateIndex extends Command
             $model = new $class;
 
             $this->indexManager->forModel($model)->createIndex();
+
+            $this->line('Successfully created index.');
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }

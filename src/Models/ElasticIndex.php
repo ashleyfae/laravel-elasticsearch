@@ -21,11 +21,11 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *
- * @property string $index_name Fully qualified index name in Elasticsearch. Includes the version.
- * @property string $read_alias
- * @property string $write_alias
- * @property string $mapping Entire mapping JSON.
- * @property array $properties Property array from the mapping.
+ * @property-read string $index_name Fully qualified index name in Elasticsearch. Includes the version.
+ * @property-read string $read_alias
+ * @property-read string $write_alias
+ * @property-read string $mapping Entire mapping JSON.
+ * @property-read array $properties Property array from the mapping.
  *
  * @mixin Builder
  */
@@ -57,7 +57,7 @@ class ElasticIndex extends Model
 
     /**
      * Retrieves the contents of the Elasticsearch mapping.
-     * Should be in: `resources/elastic-indexes/{indexable_type}.json`
+     * Should be in: `resources/elastic-indices/{indexable_type}.json`
      *
      * @param $value
      *
@@ -73,7 +73,7 @@ class ElasticIndex extends Model
         $indexMapping = false;
 
         foreach ($possibleMappings as $fileName) {
-            $filePath = resource_path(sprintf('elastic-indexes/%s.json', $fileName));
+            $filePath = resource_path(sprintf('elastic-indices/%s.json', $fileName));
             if (file_exists($filePath)) {
                 $indexMapping = file_get_contents($filePath);
                 break;
