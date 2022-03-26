@@ -50,4 +50,16 @@ class DocumentIndexer
         ]);
     }
 
+    /**
+     * Deletes the model.
+     *
+     * @return void
+     */
+    public function delete(): void
+    {
+        $this->elasticClient->delete([
+            'index' => $this->model->getElasticIndex()->write_alias,
+            'id'    => $this->model->getKey(),
+        ]);
+    }
 }

@@ -5,7 +5,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Ashleyfae\\LaravelElasticsearch\\": "src/"
+            "Ashleyfae\\LaravelElasticsearch\\": "src/",
+            "Ashleyfae\\LaravelElasticsearch\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
@@ -25,7 +26,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "\\Ashleyfae\\LaravelElasticsearch\\ElasticServiceProvider"
+                "\\Ashleyfae\\LaravelElasticsearch\\ElasticServiceProvider",
+                "\\Ashleyfae\\LaravelElasticsearch\\ElasticEventServiceProvider"
             ]
         }
     }

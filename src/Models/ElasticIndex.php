@@ -9,8 +9,10 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Models;
 
+use Ashleyfae\LaravelElasticsearch\Database\Factories\ElasticIndexFactory;
 use Ashleyfae\LaravelElasticsearch\Exceptions\ElasticsearchMappingNotFoundException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -31,6 +33,8 @@ use Illuminate\Support\Carbon;
  */
 class ElasticIndex extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'indexable_type',
         'version_number',
@@ -40,9 +44,19 @@ class ElasticIndex extends Model
         'version_number' => 'integer',
     ];
 
+    protected static function newFactory(): ElasticIndexFactory
+    {
+        return ElasticIndexFactory::new();
+    }
+
+    public function makeIndexNameForVersion(int $versionNumber): string
+    {
+        return "{$this->indexable_type}_v{$versionNumber}";
+    }
+
     public function getIndexNameAttribute($value): string
     {
-        return $this->indexable_type.'_v'.$this->version_number;
+        return $this->makeIndexNameForVersion($this->version_number);
     }
 
     public function getReadAliasAttribute($value): string

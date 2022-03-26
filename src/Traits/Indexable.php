@@ -13,18 +13,27 @@ use Ashleyfae\LaravelElasticsearch\Contracts\ResultFormatterInterface;
 use Ashleyfae\LaravelElasticsearch\Contracts\SearchInterface;
 use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
 use Ashleyfae\LaravelElasticsearch\Exceptions\ModelDoesNotExistException;
+use Ashleyfae\LaravelElasticsearch\Observers\IndexableObserver;
 use Ashleyfae\LaravelElasticsearch\Services\DocumentIndexer;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Services\Search\QueryBuilder;
 use Ashleyfae\LaravelElasticsearch\Services\Search\ResultFormatter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\App;
 
 /**
  * @mixin Model
  */
 trait Indexable
 {
+    public static function bootIndexable(): void
+    {
+        if (! defined('AF_AS_UNIT_TESTS') && ! App::runningUnitTests()) {
+            static::observe(IndexableObserver::class);
+        }
+    }
+
     /**
      * Retrieves the document indexer for this model.
      *

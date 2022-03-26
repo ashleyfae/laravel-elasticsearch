@@ -11,6 +11,7 @@ namespace Ashleyfae\LaravelElasticsearch\Services;
 
 use Ashleyfae\LaravelElasticsearch\Exceptions\IndexAlreadyExistsException;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
+use Ashleyfae\LaravelElasticsearch\Observers\ElasticIndexObserver;
 use Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel;
 use Elasticsearch\Client;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -40,12 +41,13 @@ class IndexManager
     }
 
     /**
-     * Creates an Elasticsearch index and the associated read/write aliases.
+     * Creates an Elasticsearch index.
      *
-     * @return void
+     * @see ElasticIndexObserver::saved()
+     *
      * @throws IndexAlreadyExistsException
      */
-    public function createIndex(): void
+    public function createIndexModel(): ElasticIndex
     {
         if ($this->modelHasIndex()) {
             throw new IndexAlreadyExistsException();
@@ -56,28 +58,60 @@ class IndexManager
         $index->version_number = 1;
         $index->save();
 
-        // @todo move this bit to an observer
-        $this->elasticClient->indices()->create([
-            'index' => $index->index_name,
-            'body'  => $index->mapping,
-        ]);
-
-        foreach ([$index->read_alias, $index->write_alias] as $alias) {
-            if (empty($alias)) {
-                continue;
-            }
-
-            $this->elasticClient->indices()->putAlias([
-                'index' => $index->index_name,
-                'name'  => $alias,
-            ]);
-        }
+        return $index;
     }
 
-    public function deleteIndex(): array
+    public function createIndex(string $indexName, array $mapping): void
+    {
+        $this->elasticClient->indices()->create([
+            'index' => $indexName,
+            'body'  => $mapping,
+        ]);
+    }
+
+    public function addAlias(string $indexName, string $alias): void
+    {
+        $this->elasticClient->indices()->putAlias([
+            'index' => $indexName,
+            'name'  => $alias,
+        ]);
+    }
+
+    public function deleteIndex(string $indexName): array
     {
         return $this->elasticClient->indices()->delete([
-            'index' => $this->model->getElasticIndex()->index_name,
+            'index' => $indexName,
+        ]);
+    }
+
+    /**
+     * Simultaneously removes an alias from one index and adds it to another.
+     *
+     * @param  string  $alias
+     * @param  string  $removeAliasFrom
+     * @param  string  $addAliasTo
+     *
+     * @return void
+     */
+    public function swapAlias(string $alias, string $removeAliasFrom, string $addAliasTo): void
+    {
+        $this->elasticClient->indices()->updateAliases([
+            'body' => [
+                'actions' => [
+                    [
+                        'remove' => [
+                            'index' => $removeAliasFrom,
+                            'alias' => $alias,
+                        ],
+                    ],
+                    [
+                        'add' => [
+                            'index' => $addAliasTo,
+                            'alias' => $alias,
+                        ]
+                    ]
+                ]
+            ]
         ]);
     }
 }

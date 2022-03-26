@@ -1,6 +1,6 @@
 <?php
 /**
- * CreateIndex.php
+ * Reindex.php
  *
  * @package   laravel-elasticsearch
  * @copyright Copyright (c) 2022, Ashley Gibson
@@ -10,19 +10,20 @@
 namespace Ashleyfae\LaravelElasticsearch\Console\Commands;
 
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
+use Ashleyfae\LaravelElasticsearch\Services\Reindexer;
 use Ashleyfae\LaravelElasticsearch\Tests\Models\IndexableModel;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
-class CreateIndex extends Command
+class Reindex extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'elastic:create-index {model : Model alias name.}';
+    protected $signature = 'elastic:reindex {model : Model alias name.}';
 
     /**
      * The console command description.
@@ -31,28 +32,20 @@ class CreateIndex extends Command
      */
     protected $description = 'Creates an Elasticsearch index.';
 
-    public function __construct(protected IndexManager $indexManager)
+    public function __construct(protected Reindexer $reindexer)
     {
         parent::__construct();
     }
 
-    /**
-     * Executes the command.
-     */
-    public function handle()
+    public function handle(): void
     {
         try {
-            $class = Relation::getMorphedModel($this->argument('model'));
-            if (is_null($class) || ! class_exists($class)) {
-                throw new \Exception('Model not found.');
-            }
+            $this->reindexer
+                ->setConsole($this)
+                ->forIndex($this->argument('model'))
+                ->execute();
 
-            /** @var Model&IndexableModel $model */
-            $model = new $class;
-
-            $this->indexManager->forModel($model)->createIndexModel();
-
-            $this->line('Successfully created index.');
+            $this->line('Reindex complete.');
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }

@@ -9,12 +9,14 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Tests;
 
+use Ashleyfae\LaravelElasticsearch\ElasticEventServiceProvider;
 use Ashleyfae\LaravelElasticsearch\ElasticServiceProvider;
+use Ashleyfae\LaravelElasticsearch\Tests\Helpers\CanTestInaccessibleMethods;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    use LazilyRefreshDatabase;
+    use LazilyRefreshDatabase, CanTestInaccessibleMethods;
 
     protected function getEnvironmentSetUp($app)
     {
@@ -25,6 +27,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [
             ElasticServiceProvider::class,
+            ElasticEventServiceProvider::class,
         ];
     }
 
