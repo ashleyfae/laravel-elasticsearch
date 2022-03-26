@@ -49,7 +49,8 @@ trait Indexable
     {
         return app(QueryBuilder::class)
             ->forModel($this)
-            ->setFormatter($this->getSearchFormatter());
+            ->setFormatter($this->getSearchFormatter())
+            ->setRouting($this->getElasticRoutingValue());
     }
 
     /**

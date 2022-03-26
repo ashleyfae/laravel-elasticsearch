@@ -20,6 +20,7 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use JetBrains\PhpStorm\ArrayShape;
 
 class QueryBuilder implements SearchInterface
 {
@@ -60,9 +61,15 @@ class QueryBuilder implements SearchInterface
         ));
     }
 
+    /**
+     * @inheritDoc
+     * @throws Exception
+     */
     public function paginate(int $perPage = 24, bool $lengthAware = false): AbstractPaginator
     {
-        $results = $this->takePerPage($perPage)->executeQuery();
+        $this->clauseBuilder->takePerPage($perPage);
+
+        $results = $this->executeQuery();
 
         return $this->formatter->forModel($this->model::class)->paginate(
             results: $results,
@@ -80,16 +87,7 @@ class QueryBuilder implements SearchInterface
     public function executeQuery(): array
     {
         try {
-            $args = [
-                'index' => $this->indexName,
-                'body'  => $this->clauseBuilder->getBody(),
-            ];
-
-            if (isset($this->routing)) {
-                $args['routing'] = $this->routing;
-            }
-
-            $results = $this->elasticClient->search($args);
+            $results = $this->elasticClient->search($this->makeQueryArgs());
 
             $this->totalNumberResults = Arr::get($results, 'hits.total.value', 0);
 
@@ -102,6 +100,26 @@ class QueryBuilder implements SearchInterface
 
             throw $e;
         }
+    }
+
+    /**
+     * Makes the query args.
+     *
+     * @return array
+     */
+    #[ArrayShape(['index' => "string", 'body' => "array", 'routing' => "mixed"])]
+    protected function makeQueryArgs(): array
+    {
+        $args = [
+            'index' => $this->indexName,
+            'body'  => $this->clauseBuilder->getBody(),
+        ];
+
+        if (! empty($this->routing)) {
+            $args['routing'] = $this->routing;
+        }
+
+        return $args;
     }
 
     /** @inheritDoc */
@@ -141,7 +159,7 @@ class QueryBuilder implements SearchInterface
     }
 
     /** @inheritDoc */
-    public function setClauses(ClauseBuilderInterface $clauseBuilder): static
+    public function setClauseBuilder(ClauseBuilderInterface $clauseBuilder): static
     {
         $this->clauseBuilder = $clauseBuilder;
 

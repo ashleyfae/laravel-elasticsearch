@@ -35,13 +35,7 @@ class ClauseBuilder implements ClauseBuilderInterface
         return $this->body;
     }
 
-    /**
-     * Limits the number of results.
-     *
-     * @param  int  $numberResults
-     *
-     * @return $this
-     */
+    /** @inheritDoc */
     public function take(int $numberResults): static
     {
         $this->body['size'] = $numberResults;
@@ -49,13 +43,7 @@ class ClauseBuilder implements ClauseBuilderInterface
         return $this;
     }
 
-    /**
-     * Number of results to take per page. (also sets the offset)
-     *
-     * @param  int  $numberPerPage
-     *
-     * @return $this
-     */
+    /** @inheritDoc */
     public function takePerPage(int $numberPerPage): static
     {
         $this->take($numberPerPage);
@@ -65,14 +53,7 @@ class ClauseBuilder implements ClauseBuilderInterface
         return $this;
     }
 
-    /**
-     * Adds a new search clause.
-     *
-     * @param  array  $args
-     * @param  SearchClauseType  $type
-     *
-     * @return $this
-     */
+    /** @inheritDoc */
     public function addClause(array $args, SearchClauseType $type = SearchClauseType::Must): static
     {
         $this->body['query']['bool'][$type->value][] = $args;
