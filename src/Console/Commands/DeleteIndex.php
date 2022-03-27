@@ -1,6 +1,6 @@
 <?php
 /**
- * CreateIndex.php
+ * DeleteIndex.php
  *
  * @package   laravel-elasticsearch
  * @copyright Copyright (c) 2022, Ashley Gibson
@@ -9,29 +9,27 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Console\Commands;
 
+use Ashleyfae\LaravelElasticsearch\Repositories\ElasticIndexRepository;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
-use Ashleyfae\LaravelElasticsearch\Traits\IndexableModelFromAlias;
 use Illuminate\Console\Command;
 
-class CreateIndex extends Command
+class DeleteIndex extends Command
 {
-    use IndexableModelFromAlias;
-
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'elastic:create-index {model : Model alias name.}';
+    protected $signature = 'elastic:delete-index {model : Model alias name.}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Creates an Elasticsearch index.';
+    protected $description = 'Deletes an Elasticsearch index.';
 
-    public function __construct(protected IndexManager $indexManager)
+    public function __construct(protected IndexManager $indexManager, protected ElasticIndexRepository $repository)
     {
         parent::__construct();
     }
@@ -41,10 +39,8 @@ class CreateIndex extends Command
      */
     public function handle()
     {
-        $this->indexManager
-            ->forModel($this->getIndexableFromAliasName($this->argument('model')))
-            ->createIndexModel();
+        $this->repository->getIndexByIndexableType($this->argument('model'))->delete();
 
-        $this->line('Successfully created index.');
+        $this->line('Index deleted successfully.');
     }
 }

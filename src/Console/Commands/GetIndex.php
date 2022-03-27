@@ -1,6 +1,6 @@
 <?php
 /**
- * CreateIndex.php
+ * GetIndex.php
  *
  * @package   laravel-elasticsearch
  * @copyright Copyright (c) 2022, Ashley Gibson
@@ -9,11 +9,12 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Console\Commands;
 
+use Ashleyfae\LaravelElasticsearch\Repositories\ElasticIndexRepository;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
 use Ashleyfae\LaravelElasticsearch\Traits\IndexableModelFromAlias;
 use Illuminate\Console\Command;
 
-class CreateIndex extends Command
+class GetIndex extends Command
 {
     use IndexableModelFromAlias;
 
@@ -22,16 +23,16 @@ class CreateIndex extends Command
      *
      * @var string
      */
-    protected $signature = 'elastic:create-index {model : Model alias name.}';
+    protected $signature = 'elastic:get-index {model : Model alias name.}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Creates an Elasticsearch index.';
+    protected $description = 'Retrieves an Elasticsearch index.';
 
-    public function __construct(protected IndexManager $indexManager)
+    public function __construct(protected IndexManager $indexManager, protected ElasticIndexRepository $repository)
     {
         parent::__construct();
     }
@@ -41,10 +42,13 @@ class CreateIndex extends Command
      */
     public function handle()
     {
-        $this->indexManager
-            ->forModel($this->getIndexableFromAliasName($this->argument('model')))
-            ->createIndexModel();
+        try {
+            $index = $this->indexManager
+                ->getIndex($this->repository->getIndexByIndexableType($this->argument('model'))->index_name);
 
-        $this->line('Successfully created index.');
+            dump($index);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
     }
 }

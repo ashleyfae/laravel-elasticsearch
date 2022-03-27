@@ -61,6 +61,13 @@ class IndexManager
         return $index;
     }
 
+    public function getIndex(string $indexName): array
+    {
+        return $this->elasticClient->indices()->get([
+            'index' => $indexName,
+        ]);
+    }
+
     public function createIndex(string $indexName, array $mapping): void
     {
         $this->elasticClient->indices()->create([

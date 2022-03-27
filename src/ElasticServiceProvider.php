@@ -10,6 +10,11 @@
 namespace Ashleyfae\LaravelElasticsearch;
 
 use Ashleyfae\LaravelElasticsearch\Console\Commands\CreateIndex;
+use Ashleyfae\LaravelElasticsearch\Console\Commands\DeleteIndex;
+use Ashleyfae\LaravelElasticsearch\Console\Commands\GetIndex;
+use Ashleyfae\LaravelElasticsearch\Console\Commands\Reindex;
+use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
+use Ashleyfae\LaravelElasticsearch\Observers\ElasticIndexObserver;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;
@@ -41,6 +46,8 @@ class ElasticServiceProvider extends ServiceProvider
                 __DIR__.'/../config/elasticsearch.php' => config_path('elasticsearch.php')
             ], 'config');
         }
+
+        ElasticIndex::observe(ElasticIndexObserver::class);
     }
 
     /**
@@ -53,6 +60,9 @@ class ElasticServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 CreateIndex::class,
+                DeleteIndex::class,
+                GetIndex::class,
+                Reindex::class,
             ]);
         }
 

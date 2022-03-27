@@ -14,6 +14,8 @@ use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
 
 /**
+ * Performs zero downtime reindexing by creating a new index and adding documents to it.
+ *
  * Any public properties are just to make testing easier...
  */
 class Reindexer
