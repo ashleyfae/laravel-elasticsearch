@@ -9,6 +9,7 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Console\Commands;
 
+use Ashleyfae\LaravelElasticsearch\Services\BulkDocumentReindexer;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
 use Ashleyfae\LaravelElasticsearch\Services\Reindexer;
 use Ashleyfae\LaravelElasticsearch\Tests\Models\IndexableModel;
@@ -23,7 +24,7 @@ class Reindex extends Command
      *
      * @var string
      */
-    protected $signature = 'elastic:reindex {model : Model alias name.}';
+    protected $signature = 'elastic:reindex {model : Model alias name.} {--migrate}';
 
     /**
      * The console command description.
@@ -32,22 +33,35 @@ class Reindex extends Command
      */
     protected $description = 'Creates an Elasticsearch index.';
 
-    public function __construct(protected Reindexer $reindexer)
+    public function __construct(protected Reindexer $reindexer, protected BulkDocumentReindexer $bulkDocumentReindexer)
     {
         parent::__construct();
     }
 
     public function handle(): void
     {
-        try {
-            $this->reindexer
-                ->setConsole($this)
-                ->forIndex($this->argument('model'))
-                ->execute();
-
-            $this->line('Reindex complete.');
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
+        if ($this->option('migrate')) {
+            $this->migrateToNewIndex();
+        } else {
+            $this->reindex();
         }
+
+        $this->line('Reindex complete.');
+    }
+
+    protected function migrateToNewIndex(): void
+    {
+        $this->reindexer
+            ->setConsole($this)
+            ->forIndex($this->argument('model'))
+            ->execute();
+    }
+
+    protected function reindex(): void
+    {
+        $this->bulkDocumentReindexer
+            ->setConsole($this)
+            ->forIndex($this->argument('model'))
+            ->reindex();
     }
 }

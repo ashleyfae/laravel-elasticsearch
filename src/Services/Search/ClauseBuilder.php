@@ -121,6 +121,25 @@ class ClauseBuilder implements ClauseBuilderInterface
     }
 
     /**
+     * Adds a terms aggregate.
+     *
+     * @param  string  $aggregateName
+     * @param  string  $fieldName
+     *
+     * @return $this
+     */
+    public function addTermsAggregate(string $aggregateName, string $fieldName): static
+    {
+        $this->body['aggs'][$aggregateName] = [
+            'terms' => [
+                'field' => $fieldName,
+            ],
+        ];
+
+        return $this;
+    }
+
+    /**
      * Adds a range clause.
      *
      * @param  string  $fieldName

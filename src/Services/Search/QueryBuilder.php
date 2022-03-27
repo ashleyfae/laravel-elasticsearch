@@ -12,10 +12,12 @@ namespace Ashleyfae\LaravelElasticsearch\Services\Search;
 use Ashleyfae\LaravelElasticsearch\Contracts\ClauseBuilderInterface;
 use Ashleyfae\LaravelElasticsearch\Contracts\ResultFormatterInterface;
 use Ashleyfae\LaravelElasticsearch\Contracts\SearchInterface;
+use Ashleyfae\LaravelElasticsearch\Repositories\ElasticIndexRepository;
 use Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -24,7 +26,9 @@ use JetBrains\PhpStorm\ArrayShape;
 
 class QueryBuilder implements SearchInterface
 {
-    use HasIndexableModel;
+    use HasIndexableModel {
+        forModel as traitForModel;
+    }
 
     protected ClauseBuilderInterface $clauseBuilder;
     protected ResultFormatterInterface $formatter;
@@ -37,7 +41,7 @@ class QueryBuilder implements SearchInterface
     protected string $indexName;
     protected mixed $routing;
 
-    public function __construct(protected Client $elasticClient)
+    public function __construct(protected Client $elasticClient, protected ElasticIndexRepository $elasticIndexRepository)
     {
 
     }
@@ -164,5 +168,22 @@ class QueryBuilder implements SearchInterface
         $this->clauseBuilder = $clauseBuilder;
 
         return $this;
+    }
+
+    /**
+     * Overrides the forModel() trait method so we can also set the index at the same time.
+     *
+     * @param  Model  $model
+     *
+     * @return $this
+     * @throws \Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException
+     */
+    public function forModel(Model $model): static
+    {
+        $this->traitForModel($model);
+
+        return $this->setIndex(
+            $this->elasticIndexRepository->getIndexByIndexableType($model->getMorphClass())->read_alias
+        );
     }
 }
