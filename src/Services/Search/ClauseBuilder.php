@@ -13,9 +13,12 @@ use Ashleyfae\LaravelElasticsearch\Contracts\ClauseBuilderInterface;
 use Ashleyfae\LaravelElasticsearch\Enums\SearchClauseType;
 use Ashleyfae\LaravelElasticsearch\Enums\SearchRangeComparison;
 use Ashleyfae\LaravelElasticsearch\Enums\SortDirection;
+use Illuminate\Support\Traits\Conditionable;
 
 class ClauseBuilder implements ClauseBuilderInterface
 {
+    use Conditionable;
+
     /**
      * @var array Body params.
      */
