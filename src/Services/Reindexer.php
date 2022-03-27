@@ -13,6 +13,9 @@ use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 
+/**
+ * Any public properties are just to make testing easier...
+ */
 class Reindexer
 {
     /** @var ElasticIndex model */
@@ -22,13 +25,13 @@ class Reindexer
     protected Command $command;
 
     /** @var string index name before this update */
-    protected string $previousIndexName;
+    public string $previousIndexName;
 
     /** @var string full name of the new index */
-    protected string $newIndexName;
+    public string $newIndexName;
 
     /** @var array index mapping settings */
-    protected array $mapping;
+    public array $mapping;
 
     /** @var string interval before we update the settings */
     protected mixed $originalRefreshInterval;
