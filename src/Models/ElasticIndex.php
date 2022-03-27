@@ -24,9 +24,9 @@ use Illuminate\Support\Carbon;
  * @property Carbon $updated_at
  *
  * @property-read string $index_name Fully qualified index name in Elasticsearch. Includes the version.
- * @property-read string $read_alias
- * @property-read string $write_alias
- * @property-read string $mapping Entire mapping JSON.
+ * @property-read string $read_alias {@see ElasticIndex::getReadAliasAttribute()}
+ * @property-read string $write_alias {@see ElasticIndex::getWriteAliasAttribute()}
+ * @property-read string $mapping Entire mapping JSON. {@see ElasticIndex::getMappingAttribute()}
  * @property-read array $properties Property array from the mapping.
  *
  * @mixin Builder

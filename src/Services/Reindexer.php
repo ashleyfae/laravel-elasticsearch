@@ -9,20 +9,19 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Services;
 
+use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
-use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
+use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
 
 /**
  * Any public properties are just to make testing easier...
  */
 class Reindexer
 {
+    use HasConsoleLogger;
+
     /** @var ElasticIndex model */
     protected ElasticIndex $elasticIndex;
-
-    /** @var Command console command, for writing output */
-    protected Command $command;
 
     /** @var string index name before this update */
     public string $previousIndexName;
@@ -30,17 +29,22 @@ class Reindexer
     /** @var string full name of the new index */
     public string $newIndexName;
 
+    /** @var int new version of the index; used to make the new name */
+    public int $newIndexVersion;
+
     /** @var array index mapping settings */
     public array $mapping;
 
     /** @var string interval before we update the settings */
-    protected mixed $originalRefreshInterval;
+    public mixed $originalRefreshInterval;
 
     /** @var int replica number before we updated the settings */
-    protected int $originalReplicas;
+    public int $originalReplicas;
 
-    public function __construct(protected IndexManager $indexManager)
-    {
+    public function __construct(
+        protected IndexManager $indexManager,
+        protected BulkDocumentReindexer $bulkDocumentReindexer
+    ) {
 
     }
 
@@ -64,13 +68,6 @@ class Reindexer
         return $this;
     }
 
-    public function setConsole(Command $command): static
-    {
-        $this->command = $command;
-
-        return $this;
-    }
-
     public function execute(): void
     {
         $this->setIndexNames()
@@ -84,17 +81,11 @@ class Reindexer
             ->deleteOldIndex();
     }
 
-    protected function log(string $message): void
-    {
-        if (isset($this->command)) {
-            $this->command->line($message);
-        }
-    }
-
     protected function setIndexNames(): static
     {
         $this->previousIndexName = $this->elasticIndex->index_name;
-        $this->newIndexName      = $this->elasticIndex->makeIndexNameForVersion($this->elasticIndex->version_number + 1);
+        $this->newIndexVersion   = $this->elasticIndex->version_number + 1;
+        $this->newIndexName      = $this->elasticIndex->makeIndexNameForVersion($this->newIndexVersion);
 
         return $this;
     }
@@ -106,11 +97,16 @@ class Reindexer
         return $this;
     }
 
+    /**
+     * Creates our new index.
+     *
+     * @return $this
+     */
     protected function createNewIndex(): static
     {
         $mapping = $this->mapping;
 
-        // Override the settings for fast reindexing.
+        // Override the settings for fast reindexing. We'll change them back later.
         $mapping['settings']['refresh_interval']   = 0;
         $mapping['settings']['number_of_replicas'] = 0;
 
@@ -124,15 +120,83 @@ class Reindexer
         return $this;
     }
 
+    /**
+     * Moves the write alias to the new index, so that new documents are written there.
+     *
+     * @return $this
+     */
     protected function updateWriteAlias(): static
     {
         $this->log('Swapping write alias.');
+
+        $this->indexManager->swapAlias(
+            alias: $this->elasticIndex->write_alias,
+            removeAliasFrom: $this->previousIndexName,
+            addAliasTo: $this->newIndexName
+        );
+
+        return $this;
+    }
+
+    /**
+     * @throws InvalidModelException
+     */
+    protected function addDocsToNewIndex(): static
+    {
+        $this->log('Beginning reindex.');
+
+        $this->bulkDocumentReindexer
+            ->forIndex($this->elasticIndex)
+            ->when($this->hasConsole(), function (BulkDocumentReindexer $bulkDocumentReindexer) {
+                $bulkDocumentReindexer->setConsole($this->command);
+            })
+            ->reindex();
+
+        return $this;
+    }
+
+    protected function updateNewIndexSettings(): static
+    {
+        $this->log('Updating refresh interval and replicas.');
+
+        $this->indexManager->updateIndexSettings(
+            indexName: $this->newIndexName,
+            body: [
+                'refresh_interval'   => $this->originalRefreshInterval,
+                'number_of_replicas' => $this->originalReplicas,
+            ]
+        );
+
+        return $this;
+    }
+
+    protected function updateReadAlias(): static
+    {
+        $this->log('Swapping read alias.');
 
         $this->indexManager->swapAlias(
             alias: $this->elasticIndex->read_alias,
             removeAliasFrom: $this->previousIndexName,
             addAliasTo: $this->newIndexName
         );
+
+        return $this;
+    }
+
+    protected function updateModel(): static
+    {
+        $this->log('Updating index record with new version.');
+        $this->elasticIndex->version_number = $this->newIndexVersion;
+        $this->elasticIndex->save();
+
+        return $this;
+    }
+
+    protected function deleteOldIndex(): static
+    {
+        $this->log('Deleting old index in Elasticsearch.');
+
+        $this->indexManager->deleteIndex($this->previousIndexName);
 
         return $this;
     }

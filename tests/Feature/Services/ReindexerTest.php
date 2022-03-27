@@ -84,11 +84,91 @@ class ReindexerTest extends TestCase
                 ->andReturnNull();
         });
 
-        /** @var Reindexer&Mockery\MockInterface $reindexer */
-        $reindexer = app(Reindexer::class);
-        $reindexer->mapping = ['settings' => ['refresh_interval' => '60s', 'number_of_replicas' => 5]];
+        $reindexer               = app(Reindexer::class);
+        $reindexer->mapping      = ['settings' => ['refresh_interval' => '60s', 'number_of_replicas' => 5]];
         $reindexer->newIndexName = 'index_v2';
 
         $this->invokeProtectedMethod($reindexer, 'createNewIndex');
+    }
+
+    /**
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::updateWriteAlias()
+     */
+    public function testCanUpdateWriteAlias()
+    {
+        $this->mock(IndexManager::class, function (Mockery\MockInterface $mock) {
+            $mock->expects('swapAlias')
+                ->once()
+                ->with('index_write', 'index_v1', 'index_v2')
+                ->andReturnNull();
+        });
+
+        $reindexer = app(Reindexer::class);
+        $reindexer->forIndex($this->elasticIndex);
+        $reindexer->previousIndexName = 'index_v1';
+        $reindexer->newIndexName      = 'index_v2';
+
+        $this->invokeProtectedMethod($reindexer, 'updateWriteAlias');
+    }
+
+    /**
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::updateNewIndexSettings()
+     */
+    public function testCanUpdateNewIndexSettings()
+    {
+        $this->mock(IndexManager::class, function (Mockery\MockInterface $mock) {
+            $mock->expects('updateIndexSettings')
+                ->once()
+                ->with('index_v2', [
+                    'refresh_interval'   => '60s',
+                    'number_of_replicas' => 2,
+                ])
+                ->andReturnNull();
+        });
+
+        $reindexer                          = app(Reindexer::class);
+        $reindexer->newIndexName            = 'index_v2';
+        $reindexer->originalRefreshInterval = '60s';
+        $reindexer->originalReplicas        = 2;
+
+        $this->invokeProtectedMethod($reindexer, 'updateNewIndexSettings');
+    }
+
+    /**
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::updateReadAlias()
+     */
+    public function testCanUpdateReadAlias()
+    {
+        $this->mock(IndexManager::class, function (Mockery\MockInterface $mock) {
+            $mock->expects('swapAlias')
+                ->once()
+                ->with('index_read', 'index_v1', 'index_v2')
+                ->andReturnNull();
+        });
+
+        $reindexer = app(Reindexer::class);
+        $reindexer->forIndex($this->elasticIndex);
+        $reindexer->previousIndexName = 'index_v1';
+        $reindexer->newIndexName      = 'index_v2';
+
+        $this->invokeProtectedMethod($reindexer, 'updateReadAlias');
+    }
+
+    /**
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::deleteOldIndex()
+     */
+    public function testCanDeleteOldIndex()
+    {
+        $this->mock(IndexManager::class, function (Mockery\MockInterface $mock) {
+            $mock->expects('deleteIndex')
+                ->once()
+                ->with('index_v1')
+                ->andReturnNull();
+        });
+
+        $reindexer = app(Reindexer::class);
+        $reindexer->previousIndexName = 'index_v1';
+
+        $this->invokeProtectedMethod($reindexer, 'deleteOldIndex');
     }
 }

@@ -109,7 +109,7 @@ trait Indexable
      *
      * @return array
      */
-    public function toElasticIndex(): array
+    public function toElasticDocArray(): array
     {
         return $this->toArray();
     }

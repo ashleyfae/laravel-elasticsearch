@@ -67,7 +67,7 @@ class DocumentIndexerTest extends TestCase
 
         $model->expects('getKey')->once()->andReturn(1);
 
-        $model->expects('toElasticIndex')->once()->andReturn(['data']);
+        $model->expects('toElasticDocArray')->once()->andReturn(['data']);
 
         $indexer = Mockery::mock(DocumentIndexer::class, [$client])->makePartial();
         $indexer->shouldAllowMockingProtectedMethods();

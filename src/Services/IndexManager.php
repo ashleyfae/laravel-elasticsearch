@@ -77,9 +77,9 @@ class IndexManager
         ]);
     }
 
-    public function deleteIndex(string $indexName): array
+    public function deleteIndex(string $indexName): void
     {
-        return $this->elasticClient->indices()->delete([
+        $this->elasticClient->indices()->delete([
             'index' => $indexName,
         ]);
     }
@@ -112,6 +112,14 @@ class IndexManager
                     ]
                 ]
             ]
+        ]);
+    }
+
+    public function updateIndexSettings(string $indexName, array $body): void
+    {
+        $this->elasticClient->indices()->putSettings([
+            'index' => $indexName,
+            'body'  => $body,
         ]);
     }
 }

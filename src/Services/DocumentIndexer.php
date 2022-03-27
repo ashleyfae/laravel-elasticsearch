@@ -46,7 +46,7 @@ class DocumentIndexer
         $this->elasticClient->index([
             'index' => $this->model->getElasticIndex()->write_alias,
             'id'    => $this->model->getKey(),
-            'body'  => $this->model->toElasticIndex(),
+            'body'  => $this->model->toElasticDocArray(),
         ]);
     }
 
