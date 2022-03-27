@@ -148,7 +148,7 @@ class Reindexer
         $this->log('Beginning reindex.');
 
         $this->bulkDocumentReindexer
-            ->forIndex($this->elasticIndex)
+            ->forIndexableType($this->elasticIndex)
             ->when($this->hasConsole(), function (BulkDocumentReindexer $bulkDocumentReindexer) {
                 $bulkDocumentReindexer->setConsole($this->command);
             })

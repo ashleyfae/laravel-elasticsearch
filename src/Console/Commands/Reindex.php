@@ -61,7 +61,7 @@ class Reindex extends Command
     {
         $this->bulkDocumentReindexer
             ->setConsole($this)
-            ->forIndex($this->argument('model'))
+            ->forIndexableType($this->argument('model'))
             ->reindex();
     }
 }

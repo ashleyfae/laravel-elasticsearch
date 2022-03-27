@@ -42,7 +42,7 @@ class CreateIndex extends Command
     public function handle()
     {
         $this->indexManager
-            ->forModel($this->getIndexableFromAliasName($this->argument('model')))
+            ->forIndexableType($this->argument('model'), false)
             ->createIndexModel();
 
         $this->line('Successfully created index.');

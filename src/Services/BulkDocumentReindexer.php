@@ -24,35 +24,11 @@ class BulkDocumentReindexer
 {
     use HasIndexableModel, HasConsoleLogger, Conditionable;
 
-    protected ElasticIndex $elasticIndex;
     protected int $numberReindexed = 0;
 
     public function __construct(protected Client $elasticClient)
     {
 
-    }
-
-    /**
-     * Sets the ElasticIndex.
-     *
-     * @param  string|ElasticIndex  $indexableType  Model alias name or index object.
-     *
-     * @return $this
-     * @throws InvalidModelException
-     */
-    public function forIndex(string|ElasticIndex $indexableType): static
-    {
-        if ($indexableType instanceof ElasticIndex) {
-            $this->elasticIndex = $indexableType;
-        } else {
-            $this->elasticIndex = ElasticIndex::query()
-                ->where('indexable_type', $indexableType)
-                ->firstOrFail();
-        }
-
-        $this->parseModelClass($this->elasticIndex->indexable_type);
-
-        return $this;
     }
 
     /**
@@ -70,7 +46,7 @@ class BulkDocumentReindexer
             throw new \Exception('Model not found.');
         }
 
-        $this->forModel(new $class);
+        $this->setModel(new $class);
     }
 
     public function reindex(): void

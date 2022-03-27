@@ -55,14 +55,14 @@ class HasIndexableModelTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel::forModel()
+     * @covers \Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel::setModel()
      */
     public function testCanForModel(): void
     {
         $mock = $this->getTraitMock();
         $this->assertFalse(isset($mock->model));
 
-        $mock->forModel(new IndexableModel());
+        $mock->setModel(new IndexableModel());
 
         $this->assertInstanceOf(IndexableModel::class, $mock->model);
     }

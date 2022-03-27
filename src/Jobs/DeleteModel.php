@@ -32,6 +32,6 @@ class DeleteModel implements ShouldQueue
 
     public function handle(DocumentIndexer $documentIndexer)
     {
-        $documentIndexer->forModel($this->model)->delete();
+        $documentIndexer->setModel($this->model)->delete();
     }
 }

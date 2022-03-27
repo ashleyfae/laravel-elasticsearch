@@ -33,6 +33,7 @@ class DocumentIndexerTest extends TestCase
         $client->expects('index')->never();
         $model->expects('getElasticIndex')->never();
 
+        /** @var DocumentIndexer&Mockery\MockInterface $indexer */
         $indexer = Mockery::mock(DocumentIndexer::class, [$client])->makePartial();
         $indexer->shouldAllowMockingProtectedMethods();
         $indexer->expects('modelCanBeIndexed')
@@ -42,7 +43,7 @@ class DocumentIndexerTest extends TestCase
 
         $this->expectException(ModelDoesNotExistException::class);
 
-        $indexer->forModel($model)->index();
+        $indexer->setModel($model)->index();
     }
 
     /**
@@ -69,6 +70,7 @@ class DocumentIndexerTest extends TestCase
 
         $model->expects('toElasticDocArray')->once()->andReturn(['data']);
 
+        /** @var DocumentIndexer&Mockery\MockInterface $indexer */
         $indexer = Mockery::mock(DocumentIndexer::class, [$client])->makePartial();
         $indexer->shouldAllowMockingProtectedMethods();
         $indexer->expects('modelCanBeIndexed')
@@ -76,7 +78,7 @@ class DocumentIndexerTest extends TestCase
             ->andReturn(true);
         $indexer->expects('validateModel')->once()->andReturnNull();
 
-        $indexer->forModel($model)->index();
+        $indexer->setModel($model)->index();
 
         $this->expectNotToPerformAssertions();
     }

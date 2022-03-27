@@ -35,20 +35,6 @@ trait Indexable
     }
 
     /**
-     * Retrieves the document indexer for this model.
-     *
-     * @return DocumentIndexer
-     * @throws InvalidModelException
-     */
-    public function getDocumentIndexer(): DocumentIndexer
-    {
-        /** @var DocumentIndexer $indexer */
-        $indexer = app(DocumentIndexer::class);
-
-        return $indexer->forModel(new static);
-    }
-
-    /**
      * Builds a SearchQuery object for this model.
      *
      * @return SearchInterface
@@ -57,7 +43,7 @@ trait Indexable
     public function getSearchQueryBuilder(): SearchInterface
     {
         return app(QueryBuilder::class)
-            ->forModel($this)
+            ->forIndexableType($this->getMorphClass())
             ->setFormatter($this->getSearchFormatter())
             ->setRouting($this->getElasticRoutingValue());
     }
@@ -91,17 +77,6 @@ trait Indexable
     public static function makeElasticIndex() : ElasticIndex
     {
         return (new ElasticIndex())->setAttribute('indexable_type', (new static)->getMorphClass());
-    }
-
-    /**
-     * Indexes this model.
-     *
-     * @return void
-     * @throws ModelDoesNotExistException
-     */
-    public function indexModel(): void
-    {
-        $this->getDocumentIndexer()->index();
     }
 
     /**

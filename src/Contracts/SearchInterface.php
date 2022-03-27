@@ -53,15 +53,6 @@ interface SearchInterface
     public function total(): int;
 
     /**
-     * Sets the index we're searching in.
-     *
-     * @param  string  $indexName
-     *
-     * @return static
-     */
-    public function setIndex(string $indexName): static;
-
-    /**
      * Sets the formatter to use for results.
      *
      * @param  ResultFormatterInterface  $formatter

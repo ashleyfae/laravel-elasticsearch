@@ -27,7 +27,7 @@ use JetBrains\PhpStorm\ArrayShape;
 class QueryBuilder implements SearchInterface
 {
     use HasIndexableModel {
-        forModel as traitForModel;
+        setModel as traitForModel;
     }
 
     protected ClauseBuilderInterface $clauseBuilder;
@@ -38,7 +38,6 @@ class QueryBuilder implements SearchInterface
      */
     public int $totalNumberResults = 0;
 
-    protected string $indexName;
     protected mixed $routing;
 
     public function __construct(protected Client $elasticClient, protected ElasticIndexRepository $elasticIndexRepository)
@@ -115,7 +114,7 @@ class QueryBuilder implements SearchInterface
     protected function makeQueryArgs(): array
     {
         $args = [
-            'index' => $this->indexName,
+            'index' => $this->elasticIndex->read_alias,
             'body'  => $this->clauseBuilder->getBody(),
         ];
 
@@ -130,14 +129,6 @@ class QueryBuilder implements SearchInterface
     public function total(): int
     {
         return $this->totalNumberResults;
-    }
-
-    /** @inheritDoc */
-    public function setIndex(string $indexName): static
-    {
-        $this->indexName = $indexName;
-
-        return $this;
     }
 
     /**
@@ -168,22 +159,5 @@ class QueryBuilder implements SearchInterface
         $this->clauseBuilder = $clauseBuilder;
 
         return $this;
-    }
-
-    /**
-     * Overrides the forModel() trait method so we can also set the index at the same time.
-     *
-     * @param  Model  $model
-     *
-     * @return $this
-     * @throws \Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException
-     */
-    public function forModel(Model $model): static
-    {
-        $this->traitForModel($model);
-
-        return $this->setIndex(
-            $this->elasticIndexRepository->getIndexByIndexableType($model->getMorphClass())->read_alias
-        );
     }
 }

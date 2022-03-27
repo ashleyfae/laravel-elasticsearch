@@ -32,6 +32,6 @@ class IndexModel implements ShouldQueue
 
     public function handle(DocumentIndexer $documentIndexer)
     {
-        $documentIndexer->forModel($this->model)->index();
+        $documentIndexer->setModel($this->model)->index();
     }
 }

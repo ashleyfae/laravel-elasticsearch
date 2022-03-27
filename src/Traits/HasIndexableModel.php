@@ -10,12 +10,21 @@
 namespace Ashleyfae\LaravelElasticsearch\Traits;
 
 use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
+use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
+use Ashleyfae\LaravelElasticsearch\Repositories\ElasticIndexRepository;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait HasIndexableModel
 {
     /** @var Model&Indexable */
     public Model $model;
+
+    /** @var string Indexable model alias name (indexable_type on ElasticIndex) */
+    public string $indexableType;
+
+    /** @var ElasticIndex index record */
+    public ElasticIndex $elasticIndex;
 
     /**
      * Validates the model to ensure it has the Indexable trait.
@@ -40,11 +49,38 @@ trait HasIndexableModel
      * @return $this
      * @throws InvalidModelException
      */
-    public function forModel(Model $model): static
+    public function setModel(Model $model): static
     {
         $this->validateModel($model);
 
         $this->model = $model;
+
+        return $this;
+    }
+
+    /**
+     * Sets the indexable type.
+     *
+     * @param  string|ElasticIndex  $indexableType
+     * @param  bool  $queryElasticIndex
+     *
+     * @return $this
+     * @throws InvalidModelException
+     */
+    public function forIndexableType(string|ElasticIndex $indexableType, bool $queryElasticIndex = true): static
+    {
+        if ($indexableType instanceof ElasticIndex) {
+            $this->elasticIndex  = $indexableType;
+            $this->indexableType = $this->elasticIndex->indexable_type;
+        } else {
+            $this->indexableType = $indexableType;
+
+            if ($queryElasticIndex) {
+                $this->elasticIndex = app(ElasticIndexRepository::class)->getIndexByIndexableType($this->indexableType);
+            }
+        }
+
+        $this->setModel(new (Relation::getMorphedModel($this->indexableType)));
 
         return $this;
     }
