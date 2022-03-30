@@ -111,7 +111,7 @@ class QueryBuilder implements SearchInterface
      * @return array
      */
     #[ArrayShape(['index' => "string", 'body' => "array", 'routing' => "mixed"])]
-    protected function makeQueryArgs(): array
+    public function makeQueryArgs(): array
     {
         $args = [
             'index' => $this->elasticIndex->read_alias,
