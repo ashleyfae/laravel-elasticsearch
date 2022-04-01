@@ -106,7 +106,9 @@ class Reindexer
      */
     protected function createNewIndex(): static
     {
-        $mapping = $this->mapping;
+        $mapping                       = $this->mapping;
+        $this->originalRefreshInterval = $mapping['settings']['refresh_interval'] ?? '60s';
+        $this->originalReplicas        = $mapping['settings']['number_of_replicas'] ?? 0;
 
         // Override the settings for fast reindexing. We'll change them back later.
         $mapping['settings']['refresh_interval']   = 0;
