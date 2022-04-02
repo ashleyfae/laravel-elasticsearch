@@ -126,12 +126,15 @@ class ClauseBuilder implements ClauseBuilderInterface
     /**
      * Adds a terms aggregate.
      *
+     * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html
+     *
      * @param  string  $aggregateName
      * @param  string  $fieldName
+     * @param  int  $size  Maximum number of results.
      *
      * @return $this
      */
-    public function addTermsAggregate(string $aggregateName, string $fieldName): static
+    public function addTermsAggregate(string $aggregateName, string $fieldName, int $size = 10): static
     {
         $this->body['aggs'][$aggregateName] = [
             'terms' => [

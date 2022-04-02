@@ -16,7 +16,7 @@ trait CanTestInaccessibleMethods
         $reflection = new \ReflectionClass($object);
         $method     = $reflection->getMethod($methodName);
 
-        return $method->invoke($object, $args);
+        return $method->invoke($object, ...$args);
     }
 
     public function getProtectedProperty(object $object, string $propertyName): mixed
