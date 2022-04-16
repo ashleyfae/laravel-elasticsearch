@@ -24,13 +24,15 @@ class ElasticServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        if ($this->app['config']->get('elasticsearch.hosts')) {
-            $this->app->singleton(Client::class, function ($app) {
-                return ClientBuilder::create()
-                    ->setHosts($app['config']->get('elasticsearch.hosts'))
-                    ->build();
-            });
-        }
+        $this->app->singleton(Client::class, function ($app) {
+            if (! $app['config']->get('elasticsearch.hosts')) {
+                return ClientBuilder::create()->build();
+            }
+
+            return ClientBuilder::create()
+                ->setHosts($app['config']->get('elasticsearch.hosts'))
+                ->build();
+        });
     }
 
     public function boot(): void
