@@ -18,6 +18,7 @@ use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Observers\ElasticIndexObserver;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 
 class ElasticServiceProvider extends ServiceProvider
@@ -25,9 +26,18 @@ class ElasticServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(Client::class, function ($app) {
-            return ClientBuilder::create()
-                ->setHosts($app['config']->get('elasticsearch.hosts') ?: null)
-                ->build();
+            $builder = ClientBuilder::create()
+                ->setHosts(Config::get('elasticsearch.hosts') ?: null);
+
+            if ($pw = Config::get('elasticsearch.basicAuthPw')) {
+                $builder->setBasicAuthentication('elastic', $pw);
+            }
+
+            if ($cert = Config::get('elasticsearch.caCertPath')) {
+                $builder->setSSLCert($cert);
+            }
+
+            return $builder->build();
         });
     }
 

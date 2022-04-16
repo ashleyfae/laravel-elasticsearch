@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a051ce6d3ae03caeee12c37a1b80723f",
+    "content-hash": "9276679f5993c5da2d9d4495e65b075c",
     "packages": [
         {
             "name": "elasticsearch/elasticsearch",
-            "version": "dev-master",
+            "version": "7.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/elastic/elasticsearch-php.git",
-                "reference": "da427274f774e644999bbffa15943977eaa3aacf"
+                "reference": "24c51c05103bf43fb9847acab039cba1d6e43173"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/elastic/elasticsearch-php/zipball/da427274f774e644999bbffa15943977eaa3aacf",
-                "reference": "da427274f774e644999bbffa15943977eaa3aacf",
+                "url": "https://api.github.com/repos/elastic/elasticsearch-php/zipball/24c51c05103bf43fb9847acab039cba1d6e43173",
+                "reference": "24c51c05103bf43fb9847acab039cba1d6e43173",
                 "shasum": ""
             },
             "require": {
@@ -39,9 +39,11 @@
                 "ext-curl": "*",
                 "monolog/monolog": "Allows for client-level logging and tracing"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
+                "files": [
+                    "src/autoload.php"
+                ],
                 "psr-4": {
                     "Elasticsearch\\": "src/Elasticsearch/"
                 }
@@ -66,9 +68,9 @@
             ],
             "support": {
                 "issues": "https://github.com/elastic/elasticsearch-php/issues",
-                "source": "https://github.com/elastic/elasticsearch-php/tree/master"
+                "source": "https://github.com/elastic/elasticsearch-php/tree/7.x"
             },
-            "time": "2022-03-03T11:56:36+00:00"
+            "time": "2022-01-27T10:01:11+00:00"
         },
         {
             "name": "ezimuel/guzzlestreams",
@@ -237,12 +239,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "234f8fd1023c9158e2314fa9d7d0e6a83db42910"
+                "reference": "77aa8761f0fd5e85d27082649b06499ccd30d038"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/234f8fd1023c9158e2314fa9d7d0e6a83db42910",
-                "reference": "234f8fd1023c9158e2314fa9d7d0e6a83db42910",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/77aa8761f0fd5e85d27082649b06499ccd30d038",
+                "reference": "77aa8761f0fd5e85d27082649b06499ccd30d038",
                 "shasum": ""
             },
             "require": {
@@ -294,7 +296,7 @@
             ],
             "support": {
                 "issues": "https://github.com/reactphp/promise/issues",
-                "source": "https://github.com/reactphp/promise/tree/v2.9.0"
+                "source": "https://github.com/reactphp/promise/tree/2.x"
             },
             "funding": [
                 {
@@ -306,7 +308,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-02-11T10:27:51+00:00"
+            "time": "2022-04-15T19:08:52+00:00"
         }
     ],
     "packages-dev": [
@@ -7915,9 +7917,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "elasticsearch/elasticsearch": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

@@ -17,7 +17,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=8.1",
-        "elasticsearch/elasticsearch": "dev-master"
+        "elasticsearch/elasticsearch": "^7.17"
     },
     "require-dev": {
         "orchestra/testbench": "^7.1.0",
