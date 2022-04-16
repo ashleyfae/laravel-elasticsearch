@@ -9,6 +9,7 @@
 
 namespace Ashleyfae\LaravelElasticsearch;
 
+use Ashleyfae\LaravelElasticsearch\Console\Commands\CheckStatus;
 use Ashleyfae\LaravelElasticsearch\Console\Commands\CreateIndex;
 use Ashleyfae\LaravelElasticsearch\Console\Commands\DeleteIndex;
 use Ashleyfae\LaravelElasticsearch\Console\Commands\GetIndex;
@@ -59,6 +60,7 @@ class ElasticServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
+                CheckStatus::class,
                 CreateIndex::class,
                 DeleteIndex::class,
                 GetIndex::class,
