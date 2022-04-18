@@ -43,11 +43,17 @@ class DocumentIndexer
             throw new ModelDoesNotExistException();
         }
 
-        $this->elasticClient->index([
+        $args = [
             'index' => $this->model->getElasticIndex()->write_alias,
             'id'    => $this->model->getKey(),
             'body'  => $this->model->toElasticDocArray(),
-        ]);
+        ];
+
+        if ($routing = $this->model->getElasticRoutingValue()) {
+            $args['routing'] = $routing;
+        }
+
+        $this->elasticClient->index($args);
     }
 
     /**
@@ -57,9 +63,15 @@ class DocumentIndexer
      */
     public function delete(): void
     {
-        $this->elasticClient->delete([
+        $args = [
             'index' => $this->model->getElasticIndex()->write_alias,
             'id'    => $this->model->getKey(),
-        ]);
+        ];
+
+        if ($routing = $this->model->getElasticRoutingValue()) {
+            $args['routing'] = $routing;
+        }
+
+        $this->elasticClient->delete($args);
     }
 }
