@@ -19,7 +19,7 @@ class ElasticIndexObserver
 
     }
 
-    public function saved(ElasticIndex $index): void
+    public function created(ElasticIndex $index): void
     {
         $this->indexManager->createIndex($index->index_name, json_decode($index->mapping, true));
 
