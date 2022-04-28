@@ -72,17 +72,14 @@ class BulkDocumentReindexer
             'body' => [],
         ];
 
-        if ($routingValue = $models->first()->getElasticRoutingValue()) {
-            $toReindex['routing'] = $routingValue;
-        }
-
         foreach ($models as $model) {
             /** @var Model&Indexable $model */
             $toReindex['body'][] = [
-                'index' => [
-                    '_index' => $this->elasticIndex->write_alias,
-                    '_id'    => $model->getKey(),
-                ],
+                'index' => array_filter([
+                    '_index'  => $this->elasticIndex->write_alias,
+                    '_id'     => $model->getKey(),
+                    'routing' => $model->getElasticRoutingValue(),
+                ]),
             ];
 
             $toReindex['body'][] = $model->toElasticDocArray();
