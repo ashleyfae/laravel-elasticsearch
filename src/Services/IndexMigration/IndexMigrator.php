@@ -76,17 +76,31 @@ class IndexMigrator
         return $this;
     }
 
+    /**
+     * Executes the migration.
+     *
+     * @return void
+     * @throws InvalidModelException
+     */
     public function execute(): void
     {
-        $this->setIndexNames()
-            ->parseMapping()
-            ->createNewIndex()
-            ->updateWriteAlias()
-            ->addDocsToNewIndex()
-            ->updateNewIndexSettings()
-            ->updateReadAlias()
-            ->updateModel()
-            ->deleteOldIndex();
+        try {
+            $this->setIndexNames()
+                ->parseMapping()
+                ->createNewIndex()
+                ->updateWriteAlias()
+                ->addDocsToNewIndex()
+                ->updateNewIndexSettings()
+                ->updateReadAlias()
+                ->updateModel()
+                ->deleteOldIndex();
+        } catch (\Exception $e) {
+            $this->log('ERROR - Performing rollback.');
+
+            $this->rollbackSteps();
+
+            throw $e;
+        }
     }
 
     protected function setIndexNames(): static

@@ -17,6 +17,8 @@ use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\SwapAlias;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\UpdateModelVersion;
 use Ashleyfae\LaravelElasticsearch\Tests\TestCase;
 use Elasticsearch\Client;
+use Elasticsearch\Common\Exceptions\BadMethodCallException;
+use Generator;
 use Mockery;
 
 /**
@@ -38,6 +40,75 @@ class IndexMigratorTest extends TestCase
                 'version_number' => 1,
             ]);
         });
+    }
+
+    /**
+     * @covers       \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator::execute()
+     * @dataProvider providerCanExecute
+     */
+    public function testCanExecute(?string $expectedException, bool $expectedRollback)
+    {
+        /** @var IndexMigrator&Mockery\MockInterface $migrator */
+        $migrator = $this->partialMock(IndexMigrator::class);
+        $migrator->shouldAllowMockingProtectedMethods();
+
+        $migrator->expects('setIndexNames')
+            ->once()
+            ->andReturnSelf();
+
+        $migrator->expects('parseMapping')
+            ->once()
+            ->andReturnSelf();
+
+        $migrator->expects('createNewIndex')
+            ->once()
+            ->andReturnSelf();
+
+        $migrator->expects('updateWriteAlias')
+            ->once()
+            ->andReturnSelf();
+
+        if ($expectedException) {
+            $migrator->expects('addDocsToNewIndex')
+                ->once()
+                ->andThrow($expectedException);
+        } else {
+            $migrator->expects('addDocsToNewIndex')
+                ->once()
+                ->andReturnSelf();
+        }
+
+        $migrator->expects('updateNewIndexSettings')
+            ->times($expectedException ? 0 : 1)
+            ->andReturnSelf();
+
+        $migrator->expects('updateReadAlias')
+            ->times($expectedException ? 0 : 1)
+            ->andReturnSelf();
+
+        $migrator->expects('updateModel')
+            ->times($expectedException ? 0 : 1)
+            ->andReturnSelf();
+
+        $migrator->expects('deleteOldIndex')
+            ->times($expectedException ? 0 : 1)
+            ->andReturnSelf();
+
+        $migrator->expects('rollbackSteps')
+            ->times($expectedRollback ? 1 : 0);
+
+        if ($expectedException) {
+            $this->expectException($expectedException);
+        }
+
+        $migrator->execute();
+    }
+
+    /** @see testCanExecute */
+    public function providerCanExecute(): Generator
+    {
+        yield 'with exception' => [BadMethodCallException::class, true];
+        yield 'no exception' => [null, false];
     }
 
     /**
