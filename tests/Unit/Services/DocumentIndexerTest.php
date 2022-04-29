@@ -67,6 +67,7 @@ class DocumentIndexerTest extends TestCase
             );
 
         $model->expects('getKey')->once()->andReturn(1);
+        $model->expects('getElasticRoutingValue')->once()->andReturnNull();
 
         $model->expects('toElasticDocArray')->once()->andReturn(['data']);
 
