@@ -18,6 +18,7 @@ use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\SwapAlias;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\UpdateModelVersion;
 use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
 use Ashleyfae\LaravelElasticsearch\Traits\StepsWithRollback;
+use Exception;
 
 /**
  * Performs zero downtime reindexing by creating a new index and adding documents to it.
@@ -80,7 +81,7 @@ class IndexMigrator
      * Executes the migration.
      *
      * @return void
-     * @throws InvalidModelException
+     * @throws InvalidModelException|Exception
      */
     public function execute(): void
     {
@@ -94,7 +95,7 @@ class IndexMigrator
                 ->updateReadAlias()
                 ->updateModel()
                 ->deleteOldIndex();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->log('ERROR - Performing rollback.');
 
             $this->rollbackSteps();
