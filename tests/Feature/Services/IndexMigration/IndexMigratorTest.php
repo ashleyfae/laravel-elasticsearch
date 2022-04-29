@@ -7,17 +7,17 @@
  * @license   GPL2+
  */
 
-namespace Ashleyfae\LaravelElasticsearch\Tests\Feature\Services;
+namespace Ashleyfae\LaravelElasticsearch\Tests\Feature\Services\IndexMigration;
 
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
-use Ashleyfae\LaravelElasticsearch\Services\IndexMigrator;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator;
 use Ashleyfae\LaravelElasticsearch\Tests\TestCase;
 use Elasticsearch\Client;
 use Mockery;
 
 /**
- * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator
+ * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator
  */
 class IndexMigratorTest extends TestCase
 {
@@ -38,7 +38,7 @@ class IndexMigratorTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::setIndexNames()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator::setIndexNames()
      */
     public function testCanSetIndexNames()
     {
@@ -51,7 +51,7 @@ class IndexMigratorTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::parseMapping()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator::parseMapping()
      */
     public function testCanParseMapping()
     {
@@ -73,7 +73,7 @@ class IndexMigratorTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::createNewIndex()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator::createNewIndex()
      */
     public function testCanCreateNewIndex()
     {
@@ -92,7 +92,7 @@ class IndexMigratorTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::updateWriteAlias()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator::updateWriteAlias()
      */
     public function testCanUpdateWriteAlias()
     {
@@ -112,7 +112,7 @@ class IndexMigratorTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::updateNewIndexSettings()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator::updateNewIndexSettings()
      */
     public function testCanUpdateNewIndexSettings()
     {
@@ -135,7 +135,7 @@ class IndexMigratorTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::updateReadAlias()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator::updateReadAlias()
      */
     public function testCanUpdateReadAlias()
     {
@@ -155,7 +155,7 @@ class IndexMigratorTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::deleteOldIndex()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator::deleteOldIndex()
      */
     public function testCanDeleteOldIndex()
     {

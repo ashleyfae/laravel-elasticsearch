@@ -7,10 +7,12 @@
  * @license   GPL2+
  */
 
-namespace Ashleyfae\LaravelElasticsearch\Services;
+namespace Ashleyfae\LaravelElasticsearch\Services\IndexMigration;
 
 use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
+use Ashleyfae\LaravelElasticsearch\Services\BulkDocumentReindexer;
+use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
 use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
 
 /**

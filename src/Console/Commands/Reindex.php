@@ -10,12 +10,8 @@
 namespace Ashleyfae\LaravelElasticsearch\Console\Commands;
 
 use Ashleyfae\LaravelElasticsearch\Services\BulkDocumentReindexer;
-use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
-use Ashleyfae\LaravelElasticsearch\Services\IndexMigrator;
-use Ashleyfae\LaravelElasticsearch\Tests\Models\IndexableModel;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 class Reindex extends Command
 {
