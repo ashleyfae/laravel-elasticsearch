@@ -18,7 +18,7 @@ use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
  *
  * Any public properties are just to make testing easier...
  */
-class Reindexer
+class IndexMigrator
 {
     use HasConsoleLogger;
 

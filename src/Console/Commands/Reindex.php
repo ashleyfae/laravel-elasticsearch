@@ -11,7 +11,7 @@ namespace Ashleyfae\LaravelElasticsearch\Console\Commands;
 
 use Ashleyfae\LaravelElasticsearch\Services\BulkDocumentReindexer;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
-use Ashleyfae\LaravelElasticsearch\Services\Reindexer;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigrator;
 use Ashleyfae\LaravelElasticsearch\Tests\Models\IndexableModel;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +33,7 @@ class Reindex extends Command
      */
     protected $description = 'Creates an Elasticsearch index.';
 
-    public function __construct(protected Reindexer $reindexer, protected BulkDocumentReindexer $bulkDocumentReindexer)
+    public function __construct(protected IndexMigrator $indexMigrator, protected BulkDocumentReindexer $bulkDocumentReindexer)
     {
         parent::__construct();
     }
@@ -51,7 +51,7 @@ class Reindex extends Command
 
     protected function migrateToNewIndex(): void
     {
-        $this->reindexer
+        $this->indexMigrator
             ->setConsole($this)
             ->forIndex($this->argument('model'))
             ->execute();

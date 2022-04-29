@@ -11,13 +11,13 @@ namespace Ashleyfae\LaravelElasticsearch\Tests\Feature\Services;
 
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
-use Ashleyfae\LaravelElasticsearch\Services\Reindexer;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigrator;
 use Ashleyfae\LaravelElasticsearch\Tests\TestCase;
 use Elasticsearch\Client;
 use Mockery;
 
 /**
- * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer
+ * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator
  */
 class ReindexerTest extends TestCase
 {
@@ -38,11 +38,11 @@ class ReindexerTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::setIndexNames()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::setIndexNames()
      */
     public function testCanSetIndexNames()
     {
-        $reindexer = app(Reindexer::class)->forIndex($this->elasticIndex);
+        $reindexer = app(IndexMigrator::class)->forIndex($this->elasticIndex);
 
         $this->invokeProtectedMethod($reindexer, 'setIndexNames');
 
@@ -51,7 +51,7 @@ class ReindexerTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::parseMapping()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::parseMapping()
      */
     public function testCanParseMapping()
     {
@@ -61,7 +61,7 @@ class ReindexerTest extends TestCase
             ->with('mapping')
             ->andReturn('{"properties": {"field": "value"}}');
 
-        $reindexer = app(Reindexer::class)->forIndex($mockedIndex);
+        $reindexer = app(IndexMigrator::class)->forIndex($mockedIndex);
 
         $this->invokeProtectedMethod($reindexer, 'parseMapping');
 
@@ -73,7 +73,7 @@ class ReindexerTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::createNewIndex()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::createNewIndex()
      */
     public function testCanCreateNewIndex()
     {
@@ -84,7 +84,7 @@ class ReindexerTest extends TestCase
                 ->andReturnNull();
         });
 
-        $reindexer               = app(Reindexer::class);
+        $reindexer               = app(IndexMigrator::class);
         $reindexer->mapping      = ['settings' => ['refresh_interval' => '60s', 'number_of_replicas' => 5]];
         $reindexer->newIndexName = 'index_v2';
 
@@ -92,7 +92,7 @@ class ReindexerTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::updateWriteAlias()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::updateWriteAlias()
      */
     public function testCanUpdateWriteAlias()
     {
@@ -103,7 +103,7 @@ class ReindexerTest extends TestCase
                 ->andReturnNull();
         });
 
-        $reindexer = app(Reindexer::class);
+        $reindexer = app(IndexMigrator::class);
         $reindexer->forIndex($this->elasticIndex);
         $reindexer->previousIndexName = 'index_v1';
         $reindexer->newIndexName      = 'index_v2';
@@ -112,7 +112,7 @@ class ReindexerTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::updateNewIndexSettings()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::updateNewIndexSettings()
      */
     public function testCanUpdateNewIndexSettings()
     {
@@ -126,7 +126,7 @@ class ReindexerTest extends TestCase
                 ->andReturnNull();
         });
 
-        $reindexer                          = app(Reindexer::class);
+        $reindexer                          = app(IndexMigrator::class);
         $reindexer->newIndexName            = 'index_v2';
         $reindexer->originalRefreshInterval = '60s';
         $reindexer->originalReplicas        = 2;
@@ -135,7 +135,7 @@ class ReindexerTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::updateReadAlias()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::updateReadAlias()
      */
     public function testCanUpdateReadAlias()
     {
@@ -146,7 +146,7 @@ class ReindexerTest extends TestCase
                 ->andReturnNull();
         });
 
-        $reindexer = app(Reindexer::class);
+        $reindexer = app(IndexMigrator::class);
         $reindexer->forIndex($this->elasticIndex);
         $reindexer->previousIndexName = 'index_v1';
         $reindexer->newIndexName      = 'index_v2';
@@ -155,7 +155,7 @@ class ReindexerTest extends TestCase
     }
 
     /**
-     * @covers \Ashleyfae\LaravelElasticsearch\Services\Reindexer::deleteOldIndex()
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator::deleteOldIndex()
      */
     public function testCanDeleteOldIndex()
     {
@@ -166,7 +166,7 @@ class ReindexerTest extends TestCase
                 ->andReturnNull();
         });
 
-        $reindexer = app(Reindexer::class);
+        $reindexer = app(IndexMigrator::class);
         $reindexer->previousIndexName = 'index_v1';
 
         $this->invokeProtectedMethod($reindexer, 'deleteOldIndex');
