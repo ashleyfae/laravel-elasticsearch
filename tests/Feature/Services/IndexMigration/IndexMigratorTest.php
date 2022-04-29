@@ -12,6 +12,9 @@ namespace Ashleyfae\LaravelElasticsearch\Tests\Feature\Services\IndexMigration;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\CreateNewIndex;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\SwapAlias;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\UpdateModelVersion;
 use Ashleyfae\LaravelElasticsearch\Tests\TestCase;
 use Elasticsearch\Client;
 use Mockery;
@@ -44,7 +47,7 @@ class IndexMigratorTest extends TestCase
     {
         $reindexer = app(IndexMigrator::class)->forIndex($this->elasticIndex);
 
-        $this->invokeProtectedMethod($reindexer, 'setIndexNames');
+        $this->invokeInaccessibleMethod($reindexer, 'setIndexNames');
 
         $this->assertSame('index_v1', $reindexer->previousIndexName);
         $this->assertSame('index_v2', $reindexer->newIndexName);
@@ -63,13 +66,13 @@ class IndexMigratorTest extends TestCase
 
         $reindexer = app(IndexMigrator::class)->forIndex($mockedIndex);
 
-        $this->invokeProtectedMethod($reindexer, 'parseMapping');
+        $this->invokeInaccessibleMethod($reindexer, 'parseMapping');
 
         $this->assertSame([
             'properties' => [
                 'field' => 'value',
             ],
-        ], $this->getProtectedProperty($reindexer, 'mapping'));
+        ], $this->getInaccessibleProperty($reindexer, 'mapping'));
     }
 
     /**
@@ -77,18 +80,27 @@ class IndexMigratorTest extends TestCase
      */
     public function testCanCreateNewIndex()
     {
-        $this->mock(IndexManager::class, function(Mockery\MockInterface $mock) {
-            $mock->expects('createIndex')
+        $this->mock(CreateNewIndex::class, function (Mockery\MockInterface $mock) {
+            $mock->expects('setMapping')
                 ->once()
-                ->with('index_v2', ['settings' => ['refresh_interval' => 0, 'number_of_replicas' => 0]])
-                ->andReturnNull();
+                ->with(['settings' => ['refresh_interval' => 0, 'number_of_replicas' => 0]])
+                ->andReturnSelf();
+
+            $mock->expects('setIndexName')
+                ->once()
+                ->with('index_v2')
+                ->andReturnSelf();
+
+            $mock->expects('up')
+                ->once()
+                ->andReturnSelf();
         });
 
         $reindexer               = app(IndexMigrator::class);
         $reindexer->mapping      = ['settings' => ['refresh_interval' => '60s', 'number_of_replicas' => 5]];
         $reindexer->newIndexName = 'index_v2';
 
-        $this->invokeProtectedMethod($reindexer, 'createNewIndex');
+        $this->invokeInaccessibleMethod($reindexer, 'createNewIndex');
     }
 
     /**
@@ -96,11 +108,25 @@ class IndexMigratorTest extends TestCase
      */
     public function testCanUpdateWriteAlias()
     {
-        $this->mock(IndexManager::class, function (Mockery\MockInterface $mock) {
-            $mock->expects('swapAlias')
+        $this->mock(SwapAlias::class, function (Mockery\MockInterface $mock) {
+            $mock->expects('setAliasName')
                 ->once()
-                ->with('index_write', 'index_v1', 'index_v2')
-                ->andReturnNull();
+                ->with('index_write')
+                ->andReturnSelf();
+
+            $mock->expects('setPreviousIndexName')
+                ->once()
+                ->with('index_v1')
+                ->andReturnSelf();
+
+            $mock->expects('setNewIndexName')
+                ->once()
+                ->with('index_v2')
+                ->andReturnSelf();
+
+            $mock->expects('up')
+                ->once()
+                ->andReturnSelf();
         });
 
         $reindexer = app(IndexMigrator::class);
@@ -108,7 +134,7 @@ class IndexMigratorTest extends TestCase
         $reindexer->previousIndexName = 'index_v1';
         $reindexer->newIndexName      = 'index_v2';
 
-        $this->invokeProtectedMethod($reindexer, 'updateWriteAlias');
+        $this->invokeInaccessibleMethod($reindexer, 'updateWriteAlias');
     }
 
     /**
@@ -131,7 +157,7 @@ class IndexMigratorTest extends TestCase
         $reindexer->originalRefreshInterval = '60s';
         $reindexer->originalReplicas        = 2;
 
-        $this->invokeProtectedMethod($reindexer, 'updateNewIndexSettings');
+        $this->invokeInaccessibleMethod($reindexer, 'updateNewIndexSettings');
     }
 
     /**
@@ -139,11 +165,25 @@ class IndexMigratorTest extends TestCase
      */
     public function testCanUpdateReadAlias()
     {
-        $this->mock(IndexManager::class, function (Mockery\MockInterface $mock) {
-            $mock->expects('swapAlias')
+        $this->mock(SwapAlias::class, function (Mockery\MockInterface $mock) {
+            $mock->expects('setAliasName')
                 ->once()
-                ->with('index_read', 'index_v1', 'index_v2')
-                ->andReturnNull();
+                ->with('index_read')
+                ->andReturnSelf();
+
+            $mock->expects('setPreviousIndexName')
+                ->once()
+                ->with('index_v1')
+                ->andReturnSelf();
+
+            $mock->expects('setNewIndexName')
+                ->once()
+                ->with('index_v2')
+                ->andReturnSelf();
+
+            $mock->expects('up')
+                ->once()
+                ->andReturnSelf();
         });
 
         $reindexer = app(IndexMigrator::class);
@@ -151,7 +191,41 @@ class IndexMigratorTest extends TestCase
         $reindexer->previousIndexName = 'index_v1';
         $reindexer->newIndexName      = 'index_v2';
 
-        $this->invokeProtectedMethod($reindexer, 'updateReadAlias');
+        $this->invokeInaccessibleMethod($reindexer, 'updateReadAlias');
+    }
+
+    /**
+     * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator::updateModel()
+     */
+    public function testCanUpdateModel()
+    {
+        $this->mock(UpdateModelVersion::class, function (Mockery\MockInterface $mock) {
+            $mock->expects('setElasticIndex')
+                ->once()
+                ->with($this->elasticIndex)
+                ->andReturnSelf();
+
+            $mock->expects('setNewVersion')
+                ->once()
+                ->with(2)
+                ->andReturnSelf();
+
+            $mock->expects('setPreviousVersion')
+                ->once()
+                ->with(1)
+                ->andReturnSelf();
+
+            $mock->expects('up')
+                ->once()
+                ->andReturnSelf();
+        });
+
+        $reindexer = app(IndexMigrator::class);
+        $reindexer->forIndex($this->elasticIndex);
+
+        $this->setInaccessibleProperty($reindexer, 'newIndexVersion', 2);
+
+        $this->invokeInaccessibleMethod($reindexer, 'updateModel');
     }
 
     /**
@@ -166,9 +240,9 @@ class IndexMigratorTest extends TestCase
                 ->andReturnNull();
         });
 
-        $reindexer = app(IndexMigrator::class);
+        $reindexer                    = app(IndexMigrator::class);
         $reindexer->previousIndexName = 'index_v1';
 
-        $this->invokeProtectedMethod($reindexer, 'deleteOldIndex');
+        $this->invokeInaccessibleMethod($reindexer, 'deleteOldIndex');
     }
 }

@@ -11,7 +11,7 @@ namespace Ashleyfae\LaravelElasticsearch\Tests\Helpers;
 
 trait CanTestInaccessibleMethods
 {
-    public function invokeProtectedMethod(object|string $object, string $methodName, ...$args): mixed
+    public function invokeInaccessibleMethod(object|string $object, string $methodName, ...$args): mixed
     {
         $reflection = new \ReflectionClass($object);
         $method     = $reflection->getMethod($methodName);
@@ -19,10 +19,17 @@ trait CanTestInaccessibleMethods
         return $method->invoke($object, ...$args);
     }
 
-    public function getProtectedProperty(object $object, string $propertyName): mixed
+    public function getInaccessibleProperty(object $object, string $propertyName): mixed
     {
         $reflection = new \ReflectionClass($object);
 
         return $reflection->getProperty($propertyName)->getValue($object);
+    }
+
+    public function setInaccessibleProperty(object $object, string $propertyName, mixed $propertyValue): void
+    {
+        $reflection = new \ReflectionClass($object);
+
+        $reflection->getProperty($propertyName)->setValue($object, $propertyValue);
     }
 }

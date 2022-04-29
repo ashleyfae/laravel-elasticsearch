@@ -13,7 +13,11 @@ use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Services\BulkDocumentReindexer;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\CreateNewIndex;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\SwapAlias;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\UpdateModelVersion;
 use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
+use Ashleyfae\LaravelElasticsearch\Traits\StepsWithRollback;
 
 /**
  * Performs zero downtime reindexing by creating a new index and adding documents to it.
@@ -22,7 +26,7 @@ use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
  */
 class IndexMigrator
 {
-    use HasConsoleLogger;
+    use HasConsoleLogger, StepsWithRollback;
 
     /** @var ElasticIndex model */
     protected ElasticIndex $elasticIndex;
@@ -118,9 +122,11 @@ class IndexMigrator
 
         $this->log("Creating new index {$this->newIndexName}.");
 
-        $this->indexManager->createIndex(
-            indexName: $this->newIndexName,
-            mapping: $mapping
+        $this->addCompletedStep(
+            app(CreateNewIndex::class)
+                ->setMapping($mapping)
+                ->setIndexName($this->newIndexName)
+                ->up()
         );
 
         return $this;
@@ -135,10 +141,12 @@ class IndexMigrator
     {
         $this->log('Swapping write alias.');
 
-        $this->indexManager->swapAlias(
-            alias: $this->elasticIndex->write_alias,
-            removeAliasFrom: $this->previousIndexName,
-            addAliasTo: $this->newIndexName
+        $this->addCompletedStep(
+            app(SwapAlias::class)
+                ->setAliasName($this->elasticIndex->write_alias)
+                ->setPreviousIndexName($this->previousIndexName)
+                ->setNewIndexName($this->newIndexName)
+                ->up()
         );
 
         return $this;
@@ -180,10 +188,12 @@ class IndexMigrator
     {
         $this->log('Swapping read alias.');
 
-        $this->indexManager->swapAlias(
-            alias: $this->elasticIndex->read_alias,
-            removeAliasFrom: $this->previousIndexName,
-            addAliasTo: $this->newIndexName
+        $this->addCompletedStep(
+            app(SwapAlias::class)
+                ->setAliasName($this->elasticIndex->read_alias)
+                ->setPreviousIndexName($this->previousIndexName)
+                ->setNewIndexName($this->newIndexName)
+                ->up()
         );
 
         return $this;
@@ -192,8 +202,14 @@ class IndexMigrator
     protected function updateModel(): static
     {
         $this->log('Updating index record with new version.');
-        $this->elasticIndex->version_number = $this->newIndexVersion;
-        $this->elasticIndex->save();
+
+        $this->addCompletedStep(
+            app(UpdateModelVersion::class)
+                ->setElasticIndex($this->elasticIndex)
+                ->setNewVersion($this->newIndexVersion)
+                ->setPreviousVersion($this->elasticIndex->version_number)
+                ->up()
+        );
 
         return $this;
     }
