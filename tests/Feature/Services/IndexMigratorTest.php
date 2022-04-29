@@ -19,7 +19,7 @@ use Mockery;
 /**
  * @covers \Ashleyfae\LaravelElasticsearch\Services\IndexMigrator
  */
-class ReindexerTest extends TestCase
+class IndexMigratorTest extends TestCase
 {
     protected ElasticIndex $elasticIndex;
 
