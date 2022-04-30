@@ -7,20 +7,27 @@
  * @license   GPL2+
  */
 
-namespace Ashleyfae\LaravelElasticsearch\Services;
+namespace Ashleyfae\LaravelElasticsearch\Services\IndexMigration;
 
 use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
+use Ashleyfae\LaravelElasticsearch\Services\BulkDocumentReindexer;
+use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\CreateNewIndex;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\SwapAlias;
+use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\UpdateModelVersion;
 use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
+use Ashleyfae\LaravelElasticsearch\Traits\StepsWithRollback;
+use Exception;
 
 /**
  * Performs zero downtime reindexing by creating a new index and adding documents to it.
  *
  * Any public properties are just to make testing easier...
  */
-class Reindexer
+class IndexMigrator
 {
-    use HasConsoleLogger;
+    use HasConsoleLogger, StepsWithRollback;
 
     /** @var ElasticIndex model */
     protected ElasticIndex $elasticIndex;
@@ -70,17 +77,33 @@ class Reindexer
         return $this;
     }
 
+    /**
+     * Executes the migration.
+     *
+     * @return void
+     * @throws InvalidModelException|Exception
+     */
     public function execute(): void
     {
-        $this->setIndexNames()
-            ->parseMapping()
-            ->createNewIndex()
-            ->updateWriteAlias()
-            ->addDocsToNewIndex()
-            ->updateNewIndexSettings()
-            ->updateReadAlias()
-            ->updateModel()
-            ->deleteOldIndex();
+        try {
+            $this->setIndexNames()
+                ->parseMapping()
+                ->createNewIndex()
+                ->updateWriteAlias()
+                ->addDocsToNewIndex()
+                ->updateNewIndexSettings()
+                ->updateReadAlias()
+                ->updateModel()
+                ->deleteOldIndex();
+        } catch (Exception $e) {
+            $this->log('ERROR - Performing rollback.');
+
+            $this->rollbackSteps();
+
+            $this->log('Rollback complete. Re-throwing exception.');
+
+            throw $e;
+        }
     }
 
     protected function setIndexNames(): static
@@ -116,9 +139,11 @@ class Reindexer
 
         $this->log("Creating new index {$this->newIndexName}.");
 
-        $this->indexManager->createIndex(
-            indexName: $this->newIndexName,
-            mapping: $mapping
+        $this->addCompletedStep(
+            app(CreateNewIndex::class)
+                ->setMapping($mapping)
+                ->setIndexName($this->newIndexName)
+                ->up()
         );
 
         return $this;
@@ -133,10 +158,12 @@ class Reindexer
     {
         $this->log('Swapping write alias.');
 
-        $this->indexManager->swapAlias(
-            alias: $this->elasticIndex->write_alias,
-            removeAliasFrom: $this->previousIndexName,
-            addAliasTo: $this->newIndexName
+        $this->addCompletedStep(
+            app(SwapAlias::class)
+                ->setAliasName($this->elasticIndex->write_alias)
+                ->setPreviousIndexName($this->previousIndexName)
+                ->setNewIndexName($this->newIndexName)
+                ->up()
         );
 
         return $this;
@@ -178,10 +205,12 @@ class Reindexer
     {
         $this->log('Swapping read alias.');
 
-        $this->indexManager->swapAlias(
-            alias: $this->elasticIndex->read_alias,
-            removeAliasFrom: $this->previousIndexName,
-            addAliasTo: $this->newIndexName
+        $this->addCompletedStep(
+            app(SwapAlias::class)
+                ->setAliasName($this->elasticIndex->read_alias)
+                ->setPreviousIndexName($this->previousIndexName)
+                ->setNewIndexName($this->newIndexName)
+                ->up()
         );
 
         return $this;
@@ -190,8 +219,14 @@ class Reindexer
     protected function updateModel(): static
     {
         $this->log('Updating index record with new version.');
-        $this->elasticIndex->version_number = $this->newIndexVersion;
-        $this->elasticIndex->save();
+
+        $this->addCompletedStep(
+            app(UpdateModelVersion::class)
+                ->setElasticIndex($this->elasticIndex)
+                ->setNewVersion($this->newIndexVersion)
+                ->setPreviousVersion($this->elasticIndex->version_number)
+                ->up()
+        );
 
         return $this;
     }
