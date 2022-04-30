@@ -44,6 +44,9 @@ class StepsWithRollbackTest extends TestCase
         $this->assertSame([$step], $this->getInaccessibleProperty($mock, 'completedSteps'));
     }
 
+    /**
+     * @covers StepsWithRollback::rollbackSteps()
+     */
     public function testCanRollbackSteps()
     {
         $mock           = $this->getTraitMock();
