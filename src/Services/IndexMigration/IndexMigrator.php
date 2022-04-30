@@ -100,6 +100,8 @@ class IndexMigrator
 
             $this->rollbackSteps();
 
+            $this->log('Rollback complete. Re-throwing exception.');
+
             throw $e;
         }
     }
