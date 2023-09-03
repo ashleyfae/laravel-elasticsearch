@@ -87,7 +87,12 @@ class BulkDocumentReindexer
         }
 
         if (! empty($toReindex)) {
-            $this->elasticClient->bulk($toReindex);
+            $response = $this->elasticClient->bulk($toReindex);
+
+            if (! empty($response['errors'])) {
+                $this->log('Found errors:');
+                $this->log(json_encode($response['items'] ?? [], JSON_PRETTY_PRINT));
+            }
         }
     }
 }
