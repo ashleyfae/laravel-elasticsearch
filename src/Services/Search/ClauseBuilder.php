@@ -202,4 +202,20 @@ class ClauseBuilder implements ClauseBuilderInterface
 
         return $this;
     }
+
+    /**
+     * Adds highlighting based on the search query.
+     *
+     * @param  string[]  $fields Names of the field(s) to highlight.
+     *
+     * @return $this
+     */
+    public function addHighlighting(array $fields): static
+    {
+        $this->body['highlight'] = [
+            'fields' => array_fill_keys($fields, [])
+        ];
+
+        return $this;
+    }
 }
