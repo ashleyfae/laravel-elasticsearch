@@ -212,8 +212,14 @@ class ClauseBuilder implements ClauseBuilderInterface
      */
     public function addHighlighting(array $fields): static
     {
+        if (! isset($this->body['highlight']['fields'])) {
+            $this->body['highlight']['fields'] = [];
+        }
+
+        $newFieldNames = array_fill_keys($fields, new \stdClass());
+
         $this->body['highlight'] = [
-            'fields' => array_fill_keys($fields, [])
+            'fields' => array_merge($this->body['highlight']['fields'], $newFieldNames)
         ];
 
         return $this;
