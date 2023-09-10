@@ -52,6 +52,12 @@ class ClauseBuilderTest extends TestCase
             'expectedBody' => '{"highlight":{"fields":{"description":{}}}}',
         ];
 
+        yield '1 field, no existing, empty array converted to object' => [
+            'fields' => ['description' => []],
+            'existingHighlights' => null,
+            'expectedBody' => '{"highlight":{"fields":{"description":{}}}}',
+        ];
+
         yield '1 field, has existing, no settings' => [
             'fields' => ['description' => new \stdClass()],
             'existingHighlights' => [

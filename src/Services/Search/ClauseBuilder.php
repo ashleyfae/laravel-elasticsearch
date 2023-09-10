@@ -206,7 +206,7 @@ class ClauseBuilder implements ClauseBuilderInterface
     /**
      * Adds highlighting based on the search query.
      *
-     * @param  object[]  $fields Field(s) to highlight, keyed by field name.
+     * @param  object[]|array[]  $fields Field(s) to highlight, keyed by field name.
      *
      * @return $this
      */
@@ -215,6 +215,14 @@ class ClauseBuilder implements ClauseBuilderInterface
         if (! isset($this->body['highlight']['fields'])) {
             $this->body['highlight']['fields'] = [];
         }
+
+        $fields = array_map(function($field) {
+            if (empty($field) && is_array($field)) {
+                return (object) $field;
+            }
+
+            return $field;
+        }, $fields);
 
         $this->body['highlight'] = [
             'fields' => array_merge($this->body['highlight']['fields'], $fields)
