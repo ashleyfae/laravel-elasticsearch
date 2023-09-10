@@ -24,7 +24,7 @@ class ClauseBuilderTest extends TestCase
      * @covers ::addHighlighting()
      * @dataProvider providerCanAddHighlighting
      *
-     * @param  string[]  $fields
+     * @param  object[]  $fields
      * @param array|null $existingBody
      * @param  string  $expectedBody
      *
@@ -46,14 +46,14 @@ class ClauseBuilderTest extends TestCase
     /** @see testCanAddHighlighting */
     public function providerCanAddHighlighting(): \Generator
     {
-        yield '1 field, no existing' => [
-            'fields' => ['description'],
+        yield '1 field, no existing, no settings' => [
+            'fields' => ['description' => new \stdClass()],
             'existingHighlights' => null,
             'expectedBody' => '{"highlight":{"fields":{"description":{}}}}',
         ];
 
-        yield '1 field, has existing' => [
-            'fields' => ['description'],
+        yield '1 field, has existing, no settings' => [
+            'fields' => ['description' => new \stdClass()],
             'existingHighlights' => [
                 'highlight' => [
                     'fields' => [
@@ -62,6 +62,12 @@ class ClauseBuilderTest extends TestCase
                 ],
             ],
             'expectedBody' => '{"highlight":{"fields":{"name":{},"description":{}}}}',
+        ];
+
+        yield '1 field, no existing, has settings' => [
+            'fields' => ['description' => ['number_of_fragments' => 0]],
+            'existingHighlights' => null,
+            'expectedBody' => '{"highlight":{"fields":{"description":{"number_of_fragments":0}}}}',
         ];
     }
 }
