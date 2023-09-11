@@ -207,10 +207,11 @@ class ClauseBuilder implements ClauseBuilderInterface
      * Adds highlighting based on the search query.
      *
      * @param  object[]|array[]  $fields Field(s) to highlight, keyed by field name.
+     * @param array $settings Additional highlighting settings.
      *
      * @return $this
      */
-    public function addHighlighting(array $fields): static
+    public function addHighlighting(array $fields, array $settings = []): static
     {
         if (! isset($this->body['highlight']['fields'])) {
             $this->body['highlight']['fields'] = [];
@@ -224,9 +225,9 @@ class ClauseBuilder implements ClauseBuilderInterface
             return $field;
         }, $fields);
 
-        $this->body['highlight'] = [
+        $this->body['highlight'] = array_merge($settings, [
             'fields' => array_merge($this->body['highlight']['fields'], $fields)
-        ];
+        ]);
 
         return $this;
     }

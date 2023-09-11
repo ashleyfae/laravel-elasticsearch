@@ -25,12 +25,13 @@ class ClauseBuilderTest extends TestCase
      * @dataProvider providerCanAddHighlighting
      *
      * @param  object[]  $fields
+     * @param array $highlightSettings
      * @param array|null $existingBody
      * @param  string  $expectedBody
      *
      * @return void
      */
-    public function testCanAddHighlighting(array $fields, ?array $existingBody, string $expectedBody): void
+    public function testCanAddHighlighting(array $fields, array $highlightSettings, ?array $existingBody, string $expectedBody): void
     {
         $builder = new ClauseBuilder();
 
@@ -38,7 +39,7 @@ class ClauseBuilderTest extends TestCase
             $this->setInaccessibleProperty($builder, 'body', $existingBody);
         }
 
-        $builder->addHighlighting($fields);
+        $builder->addHighlighting($fields, $highlightSettings);
 
         $this->assertSame($expectedBody, json_encode($builder->getBody()));
     }
@@ -48,18 +49,21 @@ class ClauseBuilderTest extends TestCase
     {
         yield '1 field, no existing, no settings' => [
             'fields' => ['description' => new \stdClass()],
+            'highlightSettings' => [],
             'existingHighlights' => null,
             'expectedBody' => '{"highlight":{"fields":{"description":{}}}}',
         ];
 
         yield '1 field, no existing, empty array converted to object' => [
             'fields' => ['description' => []],
+            'highlightSettings' => [],
             'existingHighlights' => null,
             'expectedBody' => '{"highlight":{"fields":{"description":{}}}}',
         ];
 
         yield '1 field, has existing, no settings' => [
             'fields' => ['description' => new \stdClass()],
+            'highlightSettings' => [],
             'existingHighlights' => [
                 'highlight' => [
                     'fields' => [
@@ -70,10 +74,20 @@ class ClauseBuilderTest extends TestCase
             'expectedBody' => '{"highlight":{"fields":{"name":{},"description":{}}}}',
         ];
 
-        yield '1 field, no existing, has settings' => [
+        yield '1 field, no existing, has field settings' => [
             'fields' => ['description' => ['number_of_fragments' => 0]],
+            'highlightSettings' => [],
             'existingHighlights' => null,
             'expectedBody' => '{"highlight":{"fields":{"description":{"number_of_fragments":0}}}}',
+        ];
+
+        yield '1 field, no existing, has field settings, has highlight settings' => [
+            'fields' => ['description' => ['number_of_fragments' => 0]],
+            'highlightSettings' => [
+                'pre_tags' => ['<mark>'],
+            ],
+            'existingHighlights' => null,
+            'expectedBody' => '{"highlight":{"pre_tags":["<mark>"],"fields":{"description":{"number_of_fragments":0}}}}',
         ];
     }
 }
