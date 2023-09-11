@@ -55,7 +55,7 @@ class ResultFormatter implements ResultFormatterInterface
         if (is_null($totalResults)) {
             return $this->makeSimplePaginator($formattedHits, $perPage);
         } else {
-            return $this->makeLengthAwarePaginator($results, $perPage, $totalResults);
+            return $this->makeLengthAwarePaginator($formattedHits, $perPage, $totalResults);
         }
     }
 
