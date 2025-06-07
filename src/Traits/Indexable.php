@@ -101,4 +101,16 @@ trait Indexable
         return null;
     }
 
+    /**
+     * Query used to query the model for bulk reindexing.
+     *
+     * @param  callable  $callback
+     *
+     * @return void
+     */
+    public static function getElasticBulkReindexQuery(callable $callback) : void
+    {
+        static::query()->chunkById(count: 1000, callback: $callback);
+    }
+
 }

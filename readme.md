@@ -81,9 +81,12 @@ Deletes the index of a given model.
 
 Gets the index of a given model.
 
-#### `elastic:reindex {model : Model alias name.} {--migrate}`
+#### `elastic:reindex {model : Model alias name.} {--migrate} {--max=}`
 
-Performs a re-indexing. Pass `--migrate` if you want to migrate to an entirely new index. This is recommended if you've adjusted the index properties.
+Performs a re-indexing.
+
+- Pass `--migrate` if you want to migrate to an entirely new index. This is recommended if you've adjusted the index properties.
+- Pass `--max=123` if you want to stop after a certain number of records. Note that due to batching this will be rounded to the nearest batch/chunk.
 
 ### Documents
 

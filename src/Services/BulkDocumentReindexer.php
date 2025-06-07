@@ -25,6 +25,7 @@ class BulkDocumentReindexer
     use HasIndexableModel, HasConsoleLogger, Conditionable;
 
     protected int $numberReindexed = 0;
+    protected ?int $maxToProcess = null;
 
     public function __construct(protected Client $elasticClient)
     {
@@ -49,14 +50,28 @@ class BulkDocumentReindexer
         $this->setModel(new $class);
     }
 
+    public function setMax(int $value) : static
+    {
+        $this->maxToProcess = $value;
+
+        return $this;
+    }
+
     public function reindex(): void
     {
-        $this->model::query()
-            ->chunkById(1000, function ($models) {
+        $this->model::getElasticBulkReindexQuery(
+            function ($models) {
                 $this->reindexBatch($models);
 
                 $this->log(sprintf('Indexed %s records.', number_format($this->numberReindexed)));
-            });
+
+                if ($this->maxToProcess && $this->numberReindexed >= $this->maxToProcess) {
+                    $this->log('Hit maximum records. Stopping.');
+
+                    return false;
+                }
+            }
+        );
     }
 
     /**

@@ -20,7 +20,7 @@ class Reindex extends Command
      *
      * @var string
      */
-    protected $signature = 'elastic:reindex {model : Model alias name.} {--migrate}';
+    protected $signature = 'elastic:reindex {model : Model alias name.} {--migrate} {--max=}';
 
     /**
      * The console command description.
@@ -58,6 +58,9 @@ class Reindex extends Command
         $this->bulkDocumentReindexer
             ->setConsole($this)
             ->forIndexableType($this->argument('model'))
+            ->when(! empty($this->option('max')), function(BulkDocumentReindexer $reindexer) {
+                $reindexer->setMax($this->option('max'));
+            })
             ->reindex();
     }
 }
