@@ -8,7 +8,13 @@ First run `php artisan migrate` to create the Elastic indices table.
 
 ### Config
 
+Set up the following environment variables:
 
+```
+ELASTICSEARCH_HOSTS=localhost:9200
+ELASTICSEARCH_PW=
+ELASTICSEARCH_CA_CERT_PATH=
+```
 
 ### Models
 
@@ -55,34 +61,40 @@ The model data sent to Elasticsearch comes from the model's `toElasticDocArray()
 
 ## Commands
 
-### `elastic:status`
+### Healthcheck
+
+#### `elastic:status`
 
 Checks the status of Elasticsaerch to ensure we can connect.
 
-### `elastic:create-index {model : Model alias name.}`
+### Indexes
+
+#### `elastic:create-index {model : Model alias name.}`
 
 Creates an index for a given model.
 
-### `elastic:delete-index {model : Model alias name.}`
+#### `elastic:delete-index {model : Model alias name.}`
 
 Deletes the index of a given model.
 
-### `elastic:get-index {model : Model alias name.}`
+#### `elastic:get-index {model : Model alias name.}`
 
 Gets the index of a given model.
 
-### `elastic:reindex {model : Model alias name.} {--migrate}`
+#### `elastic:reindex {model : Model alias name.} {--migrate}`
 
 Performs a re-indexing. Pass `--migrate` if you want to migrate to an entirely new index. This is recommended if you've adjusted the index properties.
 
-### `elastic:index-doc {model : Model alias name.} {id : ID of the corresponding model}`
+### Documents
+
+#### `elastic:index-doc {model : Model alias name.} {id : ID of the corresponding model}`
 
 Indexes a single document.
 
-### `elastic:get-doc {model : Model alias name.} {id : ID of the corresponding model}`
+#### `elastic:get-doc {model : Model alias name.} {id : ID of the corresponding model}`
 
 Retrieves a single document.
 
-### `elastic:delete-doc {model : Model alias name.} {id : ID of the corresponding model}`
+#### `elastic:delete-doc {model : Model alias name.} {id : ID of the corresponding model}`
 
 Deletes a single document.
