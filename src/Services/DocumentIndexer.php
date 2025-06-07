@@ -57,6 +57,25 @@ class DocumentIndexer
     }
 
     /**
+     * Gets the document.
+     *
+     * @return array
+     */
+    public function get() : array
+    {
+        $args = [
+            'index' => $this->model->getElasticIndex()->write_alias,
+            'id'    => $this->model->getKey(),
+        ];
+
+        if ($routing = $this->model->getElasticRoutingValue()) {
+            $args['routing'] = $routing;
+        }
+
+        return $this->elasticClient->get($args);
+    }
+
+    /**
      * Deletes the model.
      *
      * @return void

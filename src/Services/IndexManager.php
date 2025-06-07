@@ -43,7 +43,7 @@ class IndexManager
     /**
      * Creates an Elasticsearch index.
      *
-     * @see ElasticIndexObserver::saved()
+     * @see ElasticIndexObserver::created()
      *
      * @throws IndexAlreadyExistsException
      */
