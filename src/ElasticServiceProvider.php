@@ -11,8 +11,11 @@ namespace Ashleyfae\LaravelElasticsearch;
 
 use Ashleyfae\LaravelElasticsearch\Console\Commands\CheckStatus;
 use Ashleyfae\LaravelElasticsearch\Console\Commands\CreateIndex;
+use Ashleyfae\LaravelElasticsearch\Console\Commands\DeleteDocument;
 use Ashleyfae\LaravelElasticsearch\Console\Commands\DeleteIndex;
+use Ashleyfae\LaravelElasticsearch\Console\Commands\GetDocument;
 use Ashleyfae\LaravelElasticsearch\Console\Commands\GetIndex;
+use Ashleyfae\LaravelElasticsearch\Console\Commands\IndexDocument;
 use Ashleyfae\LaravelElasticsearch\Console\Commands\Reindex;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Observers\ElasticIndexObserver;
@@ -72,8 +75,11 @@ class ElasticServiceProvider extends ServiceProvider
             $this->commands([
                 CheckStatus::class,
                 CreateIndex::class,
+                DeleteDocument::class,
                 DeleteIndex::class,
+                GetDocument::class,
                 GetIndex::class,
+                IndexDocument::class,
                 Reindex::class,
             ]);
         }
