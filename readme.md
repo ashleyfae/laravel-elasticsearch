@@ -101,3 +101,8 @@ Retrieves a single document.
 #### `elastic:delete-doc {model : Model alias name.} {id : ID of the corresponding model}`
 
 Deletes a single document.
+
+## Query Builder
+
+Basic usage:
+

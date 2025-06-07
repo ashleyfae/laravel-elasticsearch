@@ -39,6 +39,7 @@ class ResultFormatter implements ResultFormatterInterface
     {
         /** @var Model $model */
         $model = new $this->modelName;
+        $model->id = Arr::get($hit, '_id');
 
         foreach (Arr::get($hit, '_source') as $propertyName => $value) {
             $model->{$propertyName} = $value;

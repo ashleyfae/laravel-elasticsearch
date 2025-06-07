@@ -17,7 +17,6 @@ use Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
