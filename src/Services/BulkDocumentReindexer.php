@@ -59,7 +59,7 @@ class BulkDocumentReindexer
 
     public function reindex(): void
     {
-        $this->model::getElasticBulkReindexQuery(
+        $this->model->getElasticBulkReindexQuery(
             function ($models) {
                 $this->reindexBatch($models);
 
