@@ -32,9 +32,7 @@ class ResultFormatter implements ResultFormatterInterface
             $formattedHits[] = $this->formatHit($hit);
         }
 
-        $formattedHits = array_filter($formattedHits);
-
-        return new \Illuminate\Database\Eloquent\Collection($formattedHits);
+        return new \Illuminate\Database\Eloquent\Collection(array_filter($formattedHits));
     }
 
     /** @inheritDoc */
