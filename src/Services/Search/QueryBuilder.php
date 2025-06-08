@@ -83,7 +83,6 @@ class QueryBuilder implements SearchInterface
     /**
      * Executes the query and returns raw results.
      *
-     * @return array
      * @throws Exception
      */
     public function executeQuery(): array

@@ -10,6 +10,7 @@
 namespace Ashleyfae\LaravelElasticsearch\Contracts;
 
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Collection;
 
 interface ResultFormatterInterface
 {
@@ -27,9 +28,9 @@ interface ResultFormatterInterface
      *
      * @param  array  $results
      *
-     * @return array
+     * @return array|Collection
      */
-    public function format(array $results): array;
+    public function format(array $results): array|Collection;
 
     /**
      * Formats an individual result.
@@ -43,11 +44,11 @@ interface ResultFormatterInterface
     /**
      * Paginates the results.
      *
-     * @param  array  $results
+     * @param  array|Collection  $results
      * @param  int  $perPage
      * @param  int|null  $totalResults
      *
      * @return AbstractPaginator
      */
-    public function paginate(array $results, int $perPage, int $totalResults = null): AbstractPaginator;
+    public function paginate(array|Collection $results, int $perPage, int $totalResults = null): AbstractPaginator;
 }

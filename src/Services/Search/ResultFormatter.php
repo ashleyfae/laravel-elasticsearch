@@ -15,6 +15,7 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class ResultFormatter implements ResultFormatterInterface
 {
@@ -22,7 +23,7 @@ class ResultFormatter implements ResultFormatterInterface
     protected string $modelName;
 
     /** @inheritDoc */
-    public function format(array $results): array
+    public function format(array $results): array|Collection
     {
         $this->hits = Arr::get($results, 'hits.hits', []);
 
@@ -31,11 +32,13 @@ class ResultFormatter implements ResultFormatterInterface
             $formattedHits[] = $this->formatHit($hit);
         }
 
-        return array_filter($formattedHits);
+        $formattedHits = array_filter($formattedHits);
+
+        return new \Illuminate\Database\Eloquent\Collection($formattedHits);
     }
 
     /** @inheritDoc */
-    public function formatHit(array $hit): mixed
+    public function formatHit(array $hit): Model
     {
         /** @var Model $model */
         $model = new $this->modelName;
@@ -49,7 +52,7 @@ class ResultFormatter implements ResultFormatterInterface
     }
 
     /** @inheritDoc */
-    public function paginate(array $results, int $perPage, int $totalResults = null): AbstractPaginator
+    public function paginate(array|Collection $results, int $perPage, int $totalResults = null): AbstractPaginator
     {
         $formattedHits = $this->format($results);
 
@@ -61,7 +64,7 @@ class ResultFormatter implements ResultFormatterInterface
     }
 
     /** @inheritDoc */
-    protected function makeSimplePaginator(array $formattedHits, int $perPage): Paginator
+    protected function makeSimplePaginator(array|Collection $formattedHits, int $perPage): Paginator
     {
         $paginator = new Paginator($formattedHits, $perPage, Paginator::resolveCurrentPage(), [
             'path'  => Paginator::resolveCurrentPath(),
