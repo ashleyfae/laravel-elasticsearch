@@ -69,4 +69,11 @@ interface SearchInterface
      * @return $this
      */
     public function setClauseBuilder(ClauseBuilderInterface $clauseBuilder): static;
+
+    /**
+     * Gets the body of the last request.
+     *
+     * @return string
+     */
+    public function getLastRequest() : string;
 }

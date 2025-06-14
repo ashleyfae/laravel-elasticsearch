@@ -97,10 +97,15 @@ class QueryBuilder implements SearchInterface
             return [];
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            Log::debug($this->elasticClient->transport->lastConnection->getLastRequestInfo()['request']['body']);
+            Log::debug($this->getLastRequest());
 
             throw $e;
         }
+    }
+
+    public function getLastRequest() : string
+    {
+        return $this->elasticClient->transport->lastConnection->getLastRequestInfo()['request']['body'];
     }
 
     /**
