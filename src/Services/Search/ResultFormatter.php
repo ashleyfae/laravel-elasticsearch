@@ -74,7 +74,7 @@ class ResultFormatter implements ResultFormatterInterface
     }
 
     protected function makeLengthAwarePaginator(
-        array $formattedHits,
+        array|Collection $formattedHits,
         int $perPage,
         int $totalResults
     ): LengthAwarePaginator {
