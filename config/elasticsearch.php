@@ -10,4 +10,9 @@ return [
     'hosts'       => explode(',', env('ELASTICSEARCH_HOSTS', 'localhost:9200')),
     'basicAuthPw' => env('ELASTICSEARCH_PW'),
     'caCertPath'  => env('ELASTICSEARCH_CA_CERT_PATH'),
+
+    'indexable' => [
+        // whether to enable the observer
+        'observer' => env('INDEXABLE_OBSERVER_ENABLED', true),
+    ],
 ];
