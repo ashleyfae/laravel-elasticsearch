@@ -12,7 +12,6 @@ return [
     'caCertPath'  => env('ELASTICSEARCH_CA_CERT_PATH'),
 
     'indexable' => [
-        // whether to enable the observer
-        'observer' => env('INDEXABLE_OBSERVER_ENABLED', true),
+        'observerEnabled' => (bool) env('INDEXABLE_OBSERVER_ENABLED', true),
     ],
 ];
