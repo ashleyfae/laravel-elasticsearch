@@ -19,6 +19,7 @@ use Ashleyfae\LaravelElasticsearch\Services\Search\ResultFormatter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 
 /**
  * @mixin Model
@@ -27,7 +28,11 @@ trait Indexable
 {
     public static function bootIndexable(): void
     {
-        if (! defined('AF_AS_UNIT_TESTS') && ! App::runningUnitTests()) {
+        if (
+            ! defined('AF_AS_UNIT_TESTS') &&
+            ! App::runningUnitTests() &&
+            Config::get('elasticsearch.indexable.observerEnabled')
+        ) {
             static::observe(IndexableObserver::class);
         }
     }
