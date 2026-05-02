@@ -51,7 +51,9 @@ class ClauseBuilder implements ClauseBuilderInterface
     {
         $this->take($numberPerPage);
 
-        $this->body['from'] = $numberPerPage * (request('page', 1) - 1);
+        $currentPage = max((int) request('page', 1), 1);
+
+        $this->body['from'] = $numberPerPage * ($currentPage - 1);
 
         return $this;
     }
