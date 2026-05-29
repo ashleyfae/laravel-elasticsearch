@@ -9,6 +9,7 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Tests\Feature\Services\IndexMigration;
 
+use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator;
@@ -106,7 +107,7 @@ class IndexMigratorTest extends TestCase
     /** @see testCanExecute */
     public function providerCanExecute(): Generator
     {
-        yield 'with exception' => [BadMethodCallException::class, true];
+        yield 'with exception' => [InvalidModelException::class, true];
         yield 'no exception' => [null, false];
     }
 

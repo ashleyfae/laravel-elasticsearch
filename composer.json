@@ -21,13 +21,20 @@
     },
     "require-dev": {
         "orchestra/testbench": "^7.1.0",
-        "mockery/mockery": "^1.5"
+        "mockery/mockery": "^1.5",
+        "dg/bypass-finals": "dev-master",
+        "guzzlehttp/psr7": "3.0.x-dev"
     },
     "extra": {
         "laravel": {
             "providers": [
                 "\\Ashleyfae\\LaravelElasticsearch\\ElasticServiceProvider"
             ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
         }
     }
 }
