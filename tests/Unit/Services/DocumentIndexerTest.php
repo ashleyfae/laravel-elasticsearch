@@ -13,8 +13,10 @@ use Ashleyfae\LaravelElasticsearch\Exceptions\ModelDoesNotExistException;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Services\DocumentIndexer;
 use Ashleyfae\LaravelElasticsearch\Tests\Models\IndexableModel;
-use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\ClientBuilder;
+use Http\Mock\Client as MockHttpClient;
 use Mockery;
+use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -49,36 +51,36 @@ class DocumentIndexerTest extends TestCase
      */
     public function testCanIndex(): void
     {
-        $model  = Mockery::mock(IndexableModel::class);
-        $client = Mockery::mock(Client::class);
+        $mockHttpClient = new MockHttpClient();
+        $mockHttpClient->addResponse(new Response(
+            200,
+            ['X-Elastic-Product' => 'Elasticsearch'],
+            json_encode(['result' => 'created'])
+        ));
 
-        $client->expects('index')->once()->with([
-            'index' => 'test_type_write',
-            'id'    => 1,
-            'body'  => ['data'],
-        ]);
+        $client = ClientBuilder::create()->setHttpClient($mockHttpClient)->build();
 
+        $model = Mockery::mock(IndexableModel::class);
         $model->expects('getElasticIndex')
             ->once()
             ->andReturn(
                 (new ElasticIndex())->setAttribute('indexable_type', 'test_type')
             );
-
         $model->expects('getKey')->once()->andReturn(1);
         $model->expects('getElasticRoutingValue')->once()->andReturnNull();
-
-        $model->expects('toElasticDocArray')->once()->andReturn(['data']);
+        $model->expects('toElasticDocArray')->once()->andReturn(['field' => 'value']);
 
         /** @var DocumentIndexer&Mockery\MockInterface $indexer */
         $indexer = Mockery::mock(DocumentIndexer::class, [$client])->makePartial();
         $indexer->shouldAllowMockingProtectedMethods();
-        $indexer->expects('modelCanBeIndexed')
-            ->once()
-            ->andReturn(true);
+        $indexer->expects('modelCanBeIndexed')->once()->andReturn(true);
         $indexer->expects('validateModel')->once()->andReturnNull();
 
         $indexer->setModel($model)->index();
 
-        $this->expectNotToPerformAssertions();
+        $request = $mockHttpClient->getLastRequest();
+        $this->assertSame('PUT', $request->getMethod());
+        $this->assertSame('/test_type_write/_doc/1', $request->getUri()->getPath());
+        $this->assertSame(['field' => 'value'], json_decode($request->getBody(), true));
     }
 }

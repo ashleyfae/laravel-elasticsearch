@@ -17,7 +17,6 @@ use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\CreateNewIndex;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\SwapAlias;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\UpdateModelVersion;
 use Ashleyfae\LaravelElasticsearch\Tests\TestCase;
-use Elastic\Elasticsearch\Client;
 use Generator;
 use Mockery;
 
@@ -31,8 +30,6 @@ class IndexMigratorTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->mock(Client::class);
 
         $this->elasticIndex = ElasticIndex::withoutEvents(function () {
             return ElasticIndex::factory()->create([

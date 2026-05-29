@@ -8,5 +8,3 @@
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';
-
-DG\BypassFinals::enable(bypassReadOnly: false);
