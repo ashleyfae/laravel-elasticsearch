@@ -14,8 +14,7 @@ use Ashleyfae\LaravelElasticsearch\Contracts\ResultFormatterInterface;
 use Ashleyfae\LaravelElasticsearch\Contracts\SearchInterface;
 use Ashleyfae\LaravelElasticsearch\Repositories\ElasticIndexRepository;
 use Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel;
-use Elasticsearch\Client;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elastic\Elasticsearch\Client;
 use Exception;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
@@ -74,7 +73,7 @@ class QueryBuilder implements SearchInterface
         $results = $this->executeQuery();
 
         return $this->formatter->forModel($this->model::class)->paginate(
-            results: $results,
+            results: $results->asArray(),
             perPage: $perPage,
             totalResults: $lengthAware ? $this->total() : null
         );
@@ -85,7 +84,7 @@ class QueryBuilder implements SearchInterface
      *
      * @throws Exception
      */
-    public function executeQuery(): array
+    public function executeQuery(): \Elastic\Elasticsearch\Response\Elasticsearch|\Http\Promise\Promise
     {
         try {
             $results = $this->elasticClient->search($this->makeQueryArgs());
@@ -93,8 +92,6 @@ class QueryBuilder implements SearchInterface
             $this->totalNumberResults = Arr::get($results, 'hits.total.value', 0);
 
             return $results;
-        } catch (Missing404Exception $e) {
-            return [];
         } catch (Exception $e) {
             Log::error($e->getMessage());
             Log::debug($this->getLastRequest());
@@ -105,7 +102,7 @@ class QueryBuilder implements SearchInterface
 
     public function getLastRequest() : string
     {
-        return $this->elasticClient->transport->lastConnection->getLastRequestInfo()['request']['body'];
+        return $this->elasticClient->getTransport()->getLastRequest()->getBody()->getContents();
     }
 
     /**

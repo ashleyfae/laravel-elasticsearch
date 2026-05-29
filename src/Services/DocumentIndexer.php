@@ -11,7 +11,13 @@ namespace Ashleyfae\LaravelElasticsearch\Services;
 
 use Ashleyfae\LaravelElasticsearch\Exceptions\ModelDoesNotExistException;
 use Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel;
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\MissingParameterException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Elasticsearch\Response\Elasticsearch;
+use Elastic\Transport\Exception\NoNodeAvailableException;
+use Http\Promise\Promise;
 
 class DocumentIndexer
 {
@@ -36,6 +42,7 @@ class DocumentIndexer
      * Indexes the current model.
      *
      * @throws ModelDoesNotExistException
+     * @throws MissingParameterException|NoNodeAvailableException|ClientResponseException|ServerResponseException
      */
     public function index(): void
     {
@@ -59,9 +66,9 @@ class DocumentIndexer
     /**
      * Gets the document.
      *
-     * @return array
+     * @throws MissingParameterException|NoNodeAvailableException|ClientResponseException|ServerResponseException
      */
-    public function get() : array
+    public function get() : Elasticsearch|Promise
     {
         $args = [
             'index' => $this->model->getElasticIndex()->write_alias,
@@ -78,7 +85,7 @@ class DocumentIndexer
     /**
      * Deletes the model.
      *
-     * @return void
+     * @throws MissingParameterException|NoNodeAvailableException|ClientResponseException|ServerResponseException
      */
     public function delete(): void
     {

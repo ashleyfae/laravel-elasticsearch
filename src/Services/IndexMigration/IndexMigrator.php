@@ -18,6 +18,9 @@ use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\SwapAlias;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\UpdateModelVersion;
 use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
 use Ashleyfae\LaravelElasticsearch\Traits\StepsWithRollback;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\MissingParameterException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Exception;
 
 /**
@@ -231,6 +234,11 @@ class IndexMigrator
         return $this;
     }
 
+    /**
+     * @throws ClientResponseException
+     * @throws MissingParameterException
+     * @throws ServerResponseException
+     */
     protected function deleteOldIndex(): static
     {
         $this->log('Deleting old index in Elasticsearch.');

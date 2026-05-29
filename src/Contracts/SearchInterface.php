@@ -9,6 +9,8 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Contracts;
 
+use Elastic\Elasticsearch\Response\Elasticsearch;
+use Http\Promise\Promise;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 
@@ -40,10 +42,8 @@ interface SearchInterface
 
     /**
      * Executes the query and returns the raw results.
-     *
-     * @return array
      */
-    public function executeQuery(): array;
+    public function executeQuery(): Elasticsearch|Promise;
 
     /**
      * Returns the total number of results from this query.

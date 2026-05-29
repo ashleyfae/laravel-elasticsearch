@@ -9,8 +9,12 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Jobs;
 
+use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
 use Ashleyfae\LaravelElasticsearch\Services\DocumentIndexer;
 use Ashleyfae\LaravelElasticsearch\Traits\Indexable;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\MissingParameterException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -30,6 +34,12 @@ class DeleteModel implements ShouldQueue
 
     }
 
+    /**
+     * @throws InvalidModelException
+     * @throws ClientResponseException
+     * @throws MissingParameterException
+     * @throws ServerResponseException
+     */
     public function handle(DocumentIndexer $documentIndexer)
     {
         $documentIndexer->setModel($this->model)->delete();

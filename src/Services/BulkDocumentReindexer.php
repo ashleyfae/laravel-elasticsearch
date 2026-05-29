@@ -10,11 +10,13 @@
 namespace Ashleyfae\LaravelElasticsearch\Services;
 
 use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
-use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Traits\HasConsoleLogger;
 use Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel;
 use Ashleyfae\LaravelElasticsearch\Traits\Indexable;
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Transport\Exception\NoNodeAvailableException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -44,7 +46,7 @@ class BulkDocumentReindexer
     {
         $class = Relation::getMorphedModel($indexableType);
         if (is_null($class) || ! class_exists($class)) {
-            throw new \Exception('Model not found.');
+            throw new InvalidModelException('Model not found.');
         }
 
         $this->setModel(new $class);
@@ -77,9 +79,7 @@ class BulkDocumentReindexer
     /**
      * Reindexes a batch of models.
      *
-     * @param  Collection  $models
-     *
-     * @return void
+     * @throws NoNodeAvailableException|ClientResponseException|ServerResponseException
      */
     protected function reindexBatch(Collection $models): void
     {

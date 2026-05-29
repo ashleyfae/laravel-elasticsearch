@@ -61,7 +61,6 @@ class ResultFormatter implements ResultFormatterInterface
         }
     }
 
-    /** @inheritDoc */
     protected function makeSimplePaginator(array|Collection $formattedHits, int $perPage): Paginator
     {
         $paginator = new Paginator($formattedHits, $perPage, Paginator::resolveCurrentPage(), [
