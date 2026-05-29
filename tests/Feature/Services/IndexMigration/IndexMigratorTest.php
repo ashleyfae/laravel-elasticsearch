@@ -16,8 +16,7 @@ use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\CreateNewIndex;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\SwapAlias;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\UpdateModelVersion;
 use Ashleyfae\LaravelElasticsearch\Tests\TestCase;
-use Elasticsearch\Client;
-use Elasticsearch\Common\Exceptions\BadMethodCallException;
+use Elastic\Elasticsearch\Client;
 use Generator;
 use Mockery;
 
