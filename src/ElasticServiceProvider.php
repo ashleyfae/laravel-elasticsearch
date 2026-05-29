@@ -19,8 +19,8 @@ use Ashleyfae\LaravelElasticsearch\Console\Commands\IndexDocument;
 use Ashleyfae\LaravelElasticsearch\Console\Commands\Reindex;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Observers\ElasticIndexObserver;
-use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\ClientBuilder;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 
@@ -37,7 +37,7 @@ class ElasticServiceProvider extends ServiceProvider
             }
 
             if ($cert = Config::get('elasticsearch.caCertPath')) {
-                $builder->setSSLCert($cert);
+                $builder->setCABundle($cert);
             }
 
             return $builder->build();
