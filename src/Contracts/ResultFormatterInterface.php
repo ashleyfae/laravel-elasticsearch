@@ -50,5 +50,5 @@ interface ResultFormatterInterface
      *
      * @return AbstractPaginator
      */
-    public function paginate(array|Collection $results, int $perPage, int $totalResults = null): AbstractPaginator;
+    public function paginate(array|Collection $results, int $perPage, ?int $totalResults = null): AbstractPaginator;
 }

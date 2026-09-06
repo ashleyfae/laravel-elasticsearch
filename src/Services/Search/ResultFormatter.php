@@ -50,7 +50,7 @@ class ResultFormatter implements ResultFormatterInterface
     }
 
     /** @inheritDoc */
-    public function paginate(array|Collection $results, int $perPage, int $totalResults = null): AbstractPaginator
+    public function paginate(array|Collection $results, int $perPage, ?int $totalResults = null): AbstractPaginator
     {
         $formattedHits = $this->format($results);
 
