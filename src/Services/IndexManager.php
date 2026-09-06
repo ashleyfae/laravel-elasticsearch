@@ -13,7 +13,13 @@ use Ashleyfae\LaravelElasticsearch\Exceptions\IndexAlreadyExistsException;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Observers\ElasticIndexObserver;
 use Ashleyfae\LaravelElasticsearch\Traits\HasIndexableModel;
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\MissingParameterException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Elasticsearch\Response\Elasticsearch;
+use Elastic\Transport\Exception\NoNodeAvailableException;
+use Http\Promise\Promise;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class IndexManager
@@ -61,13 +67,19 @@ class IndexManager
         return $index;
     }
 
-    public function getIndex(string $indexName): array
+    /**
+     * @throws MissingParameterException|NoNodeAvailableException|ClientResponseException|ServerResponseException
+     */
+    public function getIndex(string $indexName): Elasticsearch|Promise
     {
         return $this->elasticClient->indices()->get([
             'index' => $indexName,
         ]);
     }
 
+    /**
+     * @throws MissingParameterException|NoNodeAvailableException|ClientResponseException|ServerResponseException
+     */
     public function createIndex(string $indexName, array $mapping): void
     {
         $this->elasticClient->indices()->create([
@@ -76,6 +88,9 @@ class IndexManager
         ]);
     }
 
+    /**
+     * @throws MissingParameterException|NoNodeAvailableException|ClientResponseException|ServerResponseException
+     */
     public function addAlias(string $indexName, string $alias): void
     {
         $this->elasticClient->indices()->putAlias([
@@ -84,6 +99,9 @@ class IndexManager
         ]);
     }
 
+    /**
+     * @throws MissingParameterException|NoNodeAvailableException|ClientResponseException|ServerResponseException
+     */
     public function deleteIndex(string $indexName): void
     {
         $this->elasticClient->indices()->delete([
@@ -94,11 +112,7 @@ class IndexManager
     /**
      * Simultaneously removes an alias from one index and adds it to another.
      *
-     * @param  string  $alias
-     * @param  string  $removeAliasFrom
-     * @param  string  $addAliasTo
-     *
-     * @return void
+     * @throws MissingParameterException|NoNodeAvailableException|ClientResponseException|ServerResponseException
      */
     public function swapAlias(string $alias, string $removeAliasFrom, string $addAliasTo): void
     {
@@ -122,6 +136,9 @@ class IndexManager
         ]);
     }
 
+    /**
+     * @throws MissingParameterException|NoNodeAvailableException|ClientResponseException|ServerResponseException
+     */
     public function updateIndexSettings(string $indexName, array $body): void
     {
         $this->elasticClient->indices()->putSettings([

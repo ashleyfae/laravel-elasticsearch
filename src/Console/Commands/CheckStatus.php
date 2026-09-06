@@ -9,7 +9,10 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Console\Commands;
 
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Transport\Exception\NoNodeAvailableException;
 use Illuminate\Console\Command;
 
 class CheckStatus extends Command
@@ -35,6 +38,7 @@ class CheckStatus extends Command
 
     /**
      * Executes the command.
+     * @throws NoNodeAvailableException|ClientResponseException|ServerResponseException
      */
     public function handle()
     {

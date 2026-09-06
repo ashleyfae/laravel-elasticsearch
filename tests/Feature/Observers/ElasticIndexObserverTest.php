@@ -9,11 +9,7 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Tests\Feature\Observers;
 
-use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
-use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
 use Ashleyfae\LaravelElasticsearch\Tests\TestCase;
-use Elasticsearch\Client;
-use Mockery\MockInterface;
 
 class ElasticIndexObserverTest extends TestCase
 {

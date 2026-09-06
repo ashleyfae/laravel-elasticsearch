@@ -17,11 +17,14 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=8.1",
-        "elasticsearch/elasticsearch": "^7.17"
+        "elasticsearch/elasticsearch": "^8.19"
     },
     "require-dev": {
         "orchestra/testbench": "^7.1.0",
-        "mockery/mockery": "^1.5"
+        "mockery/mockery": "^1.5",
+        "guzzlehttp/psr7": "^2.13",
+        "php-http/mock-client": "1.x-dev",
+        "nyholm/psr7": "^1.8@dev"
     },
     "extra": {
         "laravel": {

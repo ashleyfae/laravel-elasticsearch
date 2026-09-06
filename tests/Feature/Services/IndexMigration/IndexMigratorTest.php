@@ -9,6 +9,7 @@
 
 namespace Ashleyfae\LaravelElasticsearch\Tests\Feature\Services\IndexMigration;
 
+use Ashleyfae\LaravelElasticsearch\Exceptions\InvalidModelException;
 use Ashleyfae\LaravelElasticsearch\Models\ElasticIndex;
 use Ashleyfae\LaravelElasticsearch\Services\IndexManager;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\IndexMigrator;
@@ -16,8 +17,6 @@ use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\CreateNewIndex;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\SwapAlias;
 use Ashleyfae\LaravelElasticsearch\Services\IndexMigration\Steps\UpdateModelVersion;
 use Ashleyfae\LaravelElasticsearch\Tests\TestCase;
-use Elasticsearch\Client;
-use Elasticsearch\Common\Exceptions\BadMethodCallException;
 use Generator;
 use Mockery;
 
@@ -31,8 +30,6 @@ class IndexMigratorTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->mock(Client::class);
 
         $this->elasticIndex = ElasticIndex::withoutEvents(function () {
             return ElasticIndex::factory()->create([
@@ -107,7 +104,7 @@ class IndexMigratorTest extends TestCase
     /** @see testCanExecute */
     public function providerCanExecute(): Generator
     {
-        yield 'with exception' => [BadMethodCallException::class, true];
+        yield 'with exception' => [InvalidModelException::class, true];
         yield 'no exception' => [null, false];
     }
 
