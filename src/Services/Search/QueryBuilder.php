@@ -58,7 +58,7 @@ class QueryBuilder implements SearchInterface
     public function get(): Collection
     {
         return collect($this->formatter->forModel($this->model::class)->format(
-            $this->executeQuery()
+            $this->executeQuery()->asArray()
         ));
     }
 
